@@ -6,16 +6,11 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+
+	todocommon "github.com/johnjallday/flow-workspace/internal/todo"
 )
 
-// ----- Minimal definitions duplicated from workspace package ----- //
-
-// Project is a minimal duplicate of the project type used in projects.toml.
-type Project struct {
-	Name string `toml:"name"`
-	Path string `toml:"path"`
-	// Add other fields if needed.
-}
+// Note: Do not redefine the Todo type here. Use todocommon.Todo everywhere.
 
 // StartTodoREPL is the interactive REPL for a single todo.md file.
 func StartTodoREPL(todoFilePath string) {
@@ -23,11 +18,14 @@ func StartTodoREPL(todoFilePath string) {
 
 	fmt.Printf("TODO REPL started for file: %s\n", filepath.Base(todoFilePath))
 	printTodoHelp()
-	todos, err := LoadAllTodos(todoFilePath)
+
+	// Use the common package's LoadAllTodos function.
+	todos, err := todocommon.LoadAllTodos(todoFilePath)
 	if err != nil {
 		fmt.Printf("Error loading tasks from '%s': %v\n", todoFilePath, err)
 	}
-	DisplayTodos(todos)
+	// Use the common package's DisplayTodos function.
+	todocommon.DisplayTodos(todos)
 
 	for {
 		fmt.Printf("\n[todo:%s] >> ", filepath.Base(todoFilePath))
@@ -50,12 +48,12 @@ func StartTodoREPL(todoFilePath string) {
 		case "help":
 			printTodoHelp()
 		case "list":
-			todos, err := LoadAllTodos(todoFilePath)
+			todos, err = todocommon.LoadAllTodos(todoFilePath)
 			if err != nil {
 				fmt.Printf("Error loading tasks from '%s': %v\n", todoFilePath, err)
 				continue
 			}
-			DisplayTodos(todos)
+			todocommon.DisplayTodos(todos)
 		case "add":
 			Add(filepath.Dir(todoFilePath))
 		case "complete":
@@ -84,12 +82,6 @@ func printTodoHelp() {
   exit              - Exit the TODO REPL
 `)
 }
-
-// -------------------------------------------------------------------------
-// The following functions wrap StartTodoREPL for different scopes.
-// They duplicate (or independently implement) the logic so that package
-// todo does not import workspace (thus avoiding an import cycle).
-// -------------------------------------------------------------------------
 
 // StartProjectTodoREPL launches the TODO REPL for a project directory.
 // It ensures that a todo.md exists in the given project directory.

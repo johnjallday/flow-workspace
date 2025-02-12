@@ -5,25 +5,27 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+
+	"github.com/johnjallday/flow-workspace/internal/todo"
 )
 
 func Complete(todoFile string, reader *bufio.Reader) {
-	todos, err := LoadAllTodos(todoFile)
+	tasks, err := todo.LoadAllTodos(todoFile)
 	if err != nil {
 		fmt.Println("Error loading tasks:", err)
 		return
 	}
 
-	if len(todos) == 0 {
+	if len(tasks) == 0 {
 		fmt.Println("No tasks available to complete.")
 		return
 	}
 
 	fmt.Println("Incomplete Tasks:")
-	var incompleteTasks []Todo
-	for _, todo := range todos {
-		if !todo.Completed {
-			incompleteTasks = append(incompleteTasks, todo)
+	var incompleteTasks []todo.Todo
+	for _, task := range tasks { // renamed loop variable to "task"
+		if !task.Completed {
+			incompleteTasks = append(incompleteTasks, task)
 		}
 	}
 
@@ -32,21 +34,21 @@ func Complete(todoFile string, reader *bufio.Reader) {
 		return
 	}
 
-	for i, todo := range incompleteTasks {
+	for i, task := range incompleteTasks { // renamed loop variable
 		dueDate := "No due date"
-		if !todo.DueDate.IsZero() {
-			dueDate = todo.DueDate.Format("2006-01-02")
+		if !task.DueDate.IsZero() {
+			dueDate = task.DueDate.Format("2006-01-02")
 		}
 		project := "No project"
-		if todo.ProjectName != "" {
-			project = todo.ProjectName
+		if task.ProjectName != "" {
+			project = task.ProjectName
 		}
 		workspace := "No workspace"
-		if todo.WorkspaceName != "" {
-			workspace = todo.WorkspaceName
+		if task.WorkspaceName != "" {
+			workspace = task.WorkspaceName
 		}
 		fmt.Printf("%d. %s (Due: %s, Project: %s, Workspace: %s)\n",
-			i+1, todo.Description, dueDate, project, workspace)
+			i+1, task.Description, dueDate, project, workspace)
 	}
 
 	fmt.Print("Enter the number of the task to mark as completed: ")
@@ -60,47 +62,47 @@ func Complete(todoFile string, reader *bufio.Reader) {
 	}
 
 	selectedTask := incompleteTasks[index-1]
-	for i, todo := range todos {
-		if todo.Description == selectedTask.Description &&
-			todo.CreatedDate.Equal(selectedTask.CreatedDate) &&
-			todo.DueDate.Equal(selectedTask.DueDate) &&
-			todo.ProjectName == selectedTask.ProjectName &&
-			todo.WorkspaceName == selectedTask.WorkspaceName &&
-			!todo.Completed {
-			todos[i].Completed = true
+	for i, task := range tasks { // renamed loop variable
+		if task.Description == selectedTask.Description &&
+			task.CreatedDate.Equal(selectedTask.CreatedDate) &&
+			task.DueDate.Equal(selectedTask.DueDate) &&
+			task.ProjectName == selectedTask.ProjectName &&
+			task.WorkspaceName == selectedTask.WorkspaceName &&
+			!task.Completed {
+			tasks[i].Completed = true
 			break
 		}
 	}
 
 	var updatedContent string
 	updatedContent += "# todo\n\n"
-	for _, todo := range todos {
+	for _, task := range tasks { // renamed loop variable
 		status := "[ ]"
-		if todo.Completed {
+		if task.Completed {
 			status = "[x]"
 		}
-		taskLine := fmt.Sprintf("- %s %s", status, todo.Description)
-		if !todo.CreatedDate.IsZero() {
-			taskLine += fmt.Sprintf(" #created:%s", todo.CreatedDate.Format("2006-01-02"))
+		taskLine := fmt.Sprintf("- %s %s", status, task.Description)
+		if !task.CreatedDate.IsZero() {
+			taskLine += fmt.Sprintf(" #created:%s", task.CreatedDate.Format("2006-01-02"))
 		}
-		if !todo.DueDate.IsZero() {
-			taskLine += fmt.Sprintf(" #due:%s", todo.DueDate.Format("2006-01-02"))
+		if !task.DueDate.IsZero() {
+			taskLine += fmt.Sprintf(" #due:%s", task.DueDate.Format("2006-01-02"))
 		}
-		if todo.ProjectName != "" {
-			taskLine += fmt.Sprintf(" #project:%s", todo.ProjectName)
+		if task.ProjectName != "" {
+			taskLine += fmt.Sprintf(" #project:%s", task.ProjectName)
 		}
-		if todo.WorkspaceName != "" {
-			taskLine += fmt.Sprintf(" #workspace:%s", todo.WorkspaceName)
+		if task.WorkspaceName != "" {
+			taskLine += fmt.Sprintf(" #workspace:%s", task.WorkspaceName)
 		}
 		taskLine += "\n"
 		updatedContent += taskLine
 	}
 
-	if err := BackupFile(todoFile); err != nil {
+	if err := todo.BackupFile(todoFile); err != nil {
 		fmt.Printf("Failed to backup 'todo.md': %v\n", err)
 	}
 
-	if err := WriteFileContent(todoFile, updatedContent); err != nil {
+	if err := todo.WriteFileContent(todoFile, updatedContent); err != nil {
 		fmt.Println("Error writing to 'todo.md':", err)
 		return
 	}

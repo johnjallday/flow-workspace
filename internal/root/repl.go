@@ -129,6 +129,5 @@ func printRootHelp() {
   projects  - List subdirectories that contain 'projects.toml'
   select    - Select a workspace by number (and load workspace REPL)
   todo      - Aggregate and list all TODOs from every workspace
-  exit      - Exit this Root REPL
-`)
+  exit      - Exit this Root REPL`)
 }

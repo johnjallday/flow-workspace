@@ -7,6 +7,7 @@ import (
 
 	"github.com/BurntSushi/toml"
 	"github.com/johnjallday/flow-workspace/internal/project"
+	"github.com/johnjallday/flow-workspace/internal/todo"
 )
 
 // Workspace represents a directory containing multiple projects.toml entries.
@@ -208,4 +209,76 @@ func ListProjects(projs *Projects) {
 		fmt.Printf("Path         : %s\n", proj.Path)
 		fmt.Printf("--------------------------------------------------\n\n")
 	}
+}
+
+func ListAllTodos(workspaceDir string) {
+	// Check for the projects.toml in the workspace.
+	projectsTomlPath := filepath.Join(workspaceDir, "projects.toml")
+	if _, err := os.Stat(projectsTomlPath); os.IsNotExist(err) {
+		fmt.Printf("Skipping workspace '%s': no projects.toml found.\n", workspaceDir)
+		return
+	}
+
+	// Load the project entries from projects.toml.
+	projs, err := LoadProjectsToml(workspaceDir)
+	if err != nil {
+		fmt.Printf("Skipping workspace '%s': error loading projects.toml: %v\n", workspaceDir, err)
+		return
+	}
+
+	// Get the workspace name from the directory's base name.
+	wsName := filepath.Base(workspaceDir)
+
+	var aggregatedTodos []todo.Todo
+
+	// For each project entry, compute its directory and load its todo.md.
+	for _, proj := range projs.Projects {
+		var projectDir string
+
+		// If a custom path is provided (and is not simply "./"), use it.
+		// Otherwise assume the project is in a folder named after the project.
+		if proj.Path != "" && proj.Path != "./" {
+			if filepath.IsAbs(proj.Path) {
+				projectDir = filepath.Clean(proj.Path)
+			} else {
+				projectDir = filepath.Join(workspaceDir, proj.Path)
+			}
+		} else {
+			projectDir = filepath.Join(workspaceDir, proj.Name)
+		}
+
+		// Look for the project's todo.md file.
+		todoFile := filepath.Join(projectDir, "todo.md")
+		if _, err := os.Stat(todoFile); os.IsNotExist(err) {
+			// Skip if todo.md does not exist.
+			continue
+		}
+
+		// Load the tasks from todo.md.
+		tasks, err := todo.LoadAllTodos(todoFile)
+		if err != nil {
+			fmt.Printf("Error loading todos from '%s': %v\n", todoFile, err)
+			continue
+		}
+
+		// Annotate each task with project and workspace names if not already set.
+		for i := range tasks {
+			if tasks[i].ProjectName == "" {
+				tasks[i].ProjectName = proj.Name
+			}
+			if tasks[i].WorkspaceName == "" {
+				tasks[i].WorkspaceName = wsName
+			}
+		}
+
+		aggregatedTodos = append(aggregatedTodos, tasks...)
+	}
+
+	// If no tasks were found, print a message and return.
+	if len(aggregatedTodos) == 0 {
+		fmt.Println("No TODOs found in this workspace.")
+		return
+	}
+
+	todo.DisplayTodos(aggregatedTodos)
 }

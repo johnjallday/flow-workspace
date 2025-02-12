@@ -1,0 +1,7 @@
+# todo
+
+- [x] ws todo view only #created:2025-02-06 #project:flow-workspace
+- [x] project todo clean and auto add tags
+- [ ] smart todo tagger based on. Use openai to decide project and workspace #created:2025-02-02
+- [ ] reinitialize AST #created:2025-01-29 #project:ASTA-ast #workspace:highland
+- [ ] cd convert to wav

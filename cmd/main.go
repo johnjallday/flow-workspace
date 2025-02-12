@@ -10,7 +10,7 @@ import (
 	projectTodo "github.com/johnjallday/flow-workspace/internal/project/todo"
 	"github.com/johnjallday/flow-workspace/internal/repl"
 	"github.com/johnjallday/flow-workspace/internal/root"
-	workspaceTodo "github.com/johnjallday/flow-workspace/internal/workspace/todo"
+	"github.com/johnjallday/flow-workspace/internal/workspace"
 )
 
 func main() {
@@ -21,7 +21,6 @@ func main() {
 	if len(args) > 0 {
 		switch args[0] {
 		case "todo":
-			// Use provided directory or default to current working directory.
 			var dir string
 			if len(args) >= 2 {
 				dir = args[1]
@@ -46,35 +45,28 @@ func main() {
 			dir = filepath.Clean(dir)
 
 			// Determine scope by checking for known marker files/folders.
-			// 1. Root scope: check for a ".config" folder.
 			configPath := filepath.Join(dir, ".config")
 			if info, err := os.Stat(configPath); err == nil && info.IsDir() {
-				// Run the root-level REPL.
 				root.ListAllTodos(dir)
 				return
 			}
 
-			// 2. Workspace scope: check for a "projects.toml" file.
 			projectsTomlPath := filepath.Join(dir, "projects.toml")
 			if _, err := os.Stat(projectsTomlPath); err == nil {
-				// Run the workspace-level REPL.
-				workspaceTodo.StartTodoREPL(dir)
+				// Updated to call ListAllTodos instead of StartTodoREPL
+				workspace.ListAllTodos(dir)
 				return
 			}
 
-			// 3. Project scope: check for a "project_info.toml" file.
 			projectInfoPath := filepath.Join(dir, "project_info.toml")
 			if _, err := os.Stat(projectInfoPath); err == nil {
-				// Run the project-level (todo) REPL.
-
 				todoFilePath := filepath.Join(dir, "todo.md")
 				projectTodo.StartTodoREPL(todoFilePath)
 				return
 			}
 
-			// Fallback: no known scope marker found. Default to the project-level REPL.
-			fmt.Println("No known scope markers found in directory. Running project-level REPL by default.")
-			projectTodo.StartTodoREPL(dir)
+			// Fallback: no known scope marker found.
+			fmt.Println("No known scope markers found in directory.")
 
 		default:
 			fmt.Println("Unknown command. Available commands: todo")

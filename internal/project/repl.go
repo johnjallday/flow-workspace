@@ -7,13 +7,13 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/johnjallday/flow-workspace/internal/project/todo"
+	"github.com/johnjallday/flow-workspace/internal/agent"
+	"github.com/johnjallday/flow-workspace/internal/todo"
 )
 
 // StartProjectREPL starts an interactive REPL for a single project directory.
 func StartProjectREPL(projectDir string) {
 	reader := bufio.NewReader(os.Stdin)
-
 	fmt.Printf("Project REPL started for directory: %s\n", projectDir)
 	printProjectHelp()
 
@@ -25,42 +25,31 @@ func StartProjectREPL(projectDir string) {
 			return
 		}
 		line = strings.TrimSpace(line)
-
 		switch strings.ToLower(line) {
 		case "exit":
 			fmt.Println("Exiting Project REPL. Goodbye!")
 			return
-
 		case "help":
 			printProjectHelp()
-
 		case "todo":
-			// Launch the TODO REPL for this project's todo.md
-			todoFilePath := filepath.Join(projectDir, "todo.md")
-			todo.StartTodoREPL(todoFilePath)
-
+			// Launch the centralized TODO REPL.
+			todoFile := filepath.Join(projectDir, "todo.md")
+			todo.StartTodoREPL(todoFile)
 		case "launch":
-			// Placeholder for launching the project (IDE, Docker, etc.)
 			LaunchProject(projectDir, "Project")
-
-		case "tree":
-			// Print directory tree for the project using PrintTree from tree.go
-			fmt.Printf("Directory tree for: %s\n", projectDir)
-			PrintTree(projectDir, "")
-
+		case "agent":
+			agent.StartAgentREPL("/Users/jj/Workspace/johnj-programming/coder/main")
 		default:
 			fmt.Println("Unknown command. Type 'help' for available commands.")
 		}
 	}
 }
 
-// printProjectHelp displays the available commands in this project-level REPL.
 func printProjectHelp() {
 	fmt.Println(`Available commands (Project REPL):
-  todo    - Open the TODO REPL for this project's todo.md
+  todo    - Open the TODO REPL for this project
   launch  - Launch the project
-  tree    - Print directory tree of the project
   help    - Show this help message
-  exit    - Exit the Project REPL
-`)
+  agent   - Start the Agent REPL
+  exit    - Exit the Project REPL`)
 }

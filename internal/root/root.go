@@ -7,8 +7,7 @@ import (
 	"path/filepath"
 
 	// Import the workspace package to load and list projects
-	//"github.com/johnjallday/flow-workspace/internal/root/todo"
-	"github.com/johnjallday/flow-workspace/internal/root/todo"
+	"github.com/johnjallday/flow-workspace/internal/todo"
 	"github.com/johnjallday/flow-workspace/internal/workspace"
 )
 
@@ -186,22 +185,6 @@ func ListAllTodos(rootDir string) {
 	}
 
 	fmt.Println("\nAggregated TODOs across all Workspaces:")
-	for i, t := range aggregatedTodos {
-		status := "[ ]"
-		if t.Completed {
-			status = "[x]"
-		}
 
-		line := fmt.Sprintf("%d. %s %s", i+1, status, t.Description)
-		if !t.DueDate.IsZero() {
-			line += fmt.Sprintf(" (Due: %s)", t.DueDate.Format("2006-01-02"))
-		}
-		if t.ProjectName != "" {
-			line += fmt.Sprintf(" [Project: %s]", t.ProjectName)
-		}
-		if t.WorkspaceName != "" {
-			line += fmt.Sprintf(" [Workspace: %s]", t.WorkspaceName)
-		}
-		fmt.Println(line)
-	}
+	todo.DisplayTodos(aggregatedTodos)
 }

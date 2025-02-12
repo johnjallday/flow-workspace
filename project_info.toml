@@ -1,8 +1,8 @@
 name = "flow-workspace"
 alias = "fw"
-project_type = ""
-tags = []
+project_type = "coding"
+tags = ["golang", "repl", "workspace", "cli"]
 date_created = "2025-01-26T10:20:10.626962246+00:00"
 date_modified = "2025-01-26T22:47:47.111211148+00:00"
 notes = ["workspace manager ai"]
-path = ""
+path = "/Users/jj/Workspace/johnj-programming/flow-workspace/"

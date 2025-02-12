@@ -1,6 +1,7 @@
 package todo
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"time"
@@ -22,11 +23,10 @@ func tagProject(projectPath string) string {
 // otherwise it returns an empty string.
 func tagWorkspace(projectPath string) string {
 	// Get the parent folder of projectPath.
-	parentPath := filepath.Dir(projectPath)
+	workspacePath := filepath.Dir(projectPath)
 	// Get the folder one level above parentPath (i.e. two levels above projectPath).
-	workspacePath := filepath.Dir(parentPath)
-	wsInfoPath := filepath.Join(workspacePath, "ws_info.toml")
-	if _, err := os.Stat(wsInfoPath); err == nil {
+	fmt.Println(filepath.Base(workspacePath))
+	if _, err := os.Stat(workspacePath); err == nil {
 		return filepath.Base(workspacePath)
 	}
 	return ""

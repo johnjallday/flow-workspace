@@ -5,10 +5,12 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+
+	"github.com/johnjallday/flow-workspace/internal/todo"
 )
 
 func Delete(todoFile string, reader *bufio.Reader) {
-	todos, err := LoadAllTodos(todoFile)
+	todos, err := todo.LoadAllTodos(todoFile)
 	if err != nil {
 		fmt.Println("Error loading tasks:", err)
 		return
@@ -64,11 +66,11 @@ func Delete(todoFile string, reader *bufio.Reader) {
 		updatedContent += taskLine
 	}
 
-	if err := BackupFile(todoFile); err != nil {
+	if err := todo.BackupFile(todoFile); err != nil {
 		fmt.Printf("Failed to backup 'todo.md': %v\n", err)
 	}
 
-	if err := WriteFileContent(todoFile, updatedContent); err != nil {
+	if err := todo.WriteFileContent(todoFile, updatedContent); err != nil {
 		fmt.Println("Error writing to 'todo.md':", err)
 		return
 	}

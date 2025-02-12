@@ -10,7 +10,6 @@ import (
 	"strings"
 
 	"github.com/johnjallday/flow-workspace/internal/project"
-	tws "github.com/johnjallday/flow-workspace/internal/workspace/todo"
 )
 
 // StartWorkspaceREPL starts an interactive REPL for the specified workspace directory.
@@ -54,7 +53,7 @@ func StartWorkspaceREPL(workspaceDir string) {
 		case "todo":
 			// Lists aggregated TODOs for all projects in this workspace.
 			// Note: we now call the function from the new aggregated workspace todo package.
-			tws.StartTodoREPL(workspaceDir)
+			ListAllTodos(workspaceDir)
 
 		case "select project":
 			// Let the user choose a project by number, then start the Project REPL
@@ -86,8 +85,7 @@ func printWorkspaceHelp() {
   todo             - List aggregated TODOs from all projects in this workspace
   select project   - Choose a project to open the Project REPL
   exit             - Exit the Workspace REPL
-  update projects  - Scan the workspace for new projects and update the projects.toml file
-`)
+  update projects  - Scan the workspace for new projects and update the projects.toml file`)
 }
 
 // selectProject lets the user pick from the loaded Projects, then starts the Project REPL.

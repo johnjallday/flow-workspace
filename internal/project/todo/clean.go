@@ -3,10 +3,12 @@ package todo
 import (
 	"fmt"
 	"strings"
+
+	"github.com/johnjallday/flow-workspace/internal/todo"
 )
 
 func CleanUpTodoFile(filename string) error {
-	content, err := ReadFileContent(filename)
+	content, err := todo.ReadFileContent(filename)
 	if err != nil {
 		return fmt.Errorf("error reading '%s': %w", filename, err)
 	}
@@ -54,7 +56,7 @@ func CleanUpTodoFile(filename string) error {
 	updatedLines = append(updatedLines, tasks...)
 	updatedContent := strings.Join(updatedLines, "\n")
 
-	if err := WriteFileContent(filename, updatedContent); err != nil {
+	if err := todo.WriteFileContent(filename, updatedContent); err != nil {
 		return fmt.Errorf("error writing to '%s': %w", filename, err)
 	}
 
