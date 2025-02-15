@@ -98,10 +98,6 @@ func Complete(todoFile string, reader *bufio.Reader) {
 		updatedContent += taskLine
 	}
 
-	if err := todo.BackupFile(todoFile); err != nil {
-		fmt.Printf("Failed to backup 'todo.md': %v\n", err)
-	}
-
 	if err := todo.WriteFileContent(todoFile, updatedContent); err != nil {
 		fmt.Println("Error writing to 'todo.md':", err)
 		return

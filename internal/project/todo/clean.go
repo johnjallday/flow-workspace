@@ -29,7 +29,7 @@ func CleanUpTodoFile(filename string) error {
 	}
 
 	if len(headers) == 0 {
-		lines = append([]string{"# todo", ""}, lines...)
+		// lines = append([]string{"# todo", ""}, lines...)
 	} else {
 		if len(headers) > 1 {
 			for i := 1; i < len(headers); i++ {

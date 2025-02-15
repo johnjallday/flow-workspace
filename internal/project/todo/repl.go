@@ -79,8 +79,7 @@ func printTodoHelp() {
   edit              - Edit a task
   weekly            - Run the weekly review for this TODO file
   help              - Show this help message
-  exit              - Exit the TODO REPL
-`)
+  exit              - Exit the TODO REPL`)
 }
 
 // StartProjectTodoREPL launches the TODO REPL for a project directory.
