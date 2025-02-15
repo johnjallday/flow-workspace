@@ -11,7 +11,7 @@ import (
 // Todo represents a single task.
 type Todo struct {
 	Description   string
-	Completed     bool
+	CompletedDate time.Time // non-zero means the task is complete
 	CreatedDate   time.Time
 	DueDate       time.Time
 	ProjectName   string
@@ -53,10 +53,12 @@ func parseTodo(line string) (Todo, error) {
 	var t Todo
 
 	if strings.HasPrefix(line, "- [x]") {
-		t.Completed = true
+		// Mark as completed; here we set the CompletedDate.
+		// You could use time.Now() or parse a date from a tag if available.
+		t.CompletedDate = time.Now()
 		line = strings.TrimPrefix(line, "- [x]")
 	} else if strings.HasPrefix(line, "- [ ]") {
-		t.Completed = false
+		// Not completed, leave CompletedDate as zero value.
 		line = strings.TrimPrefix(line, "- [ ]")
 	} else {
 		return t, fmt.Errorf("invalid task format")
@@ -85,6 +87,13 @@ func parseTodo(line string) (Todo, error) {
 				t.ProjectName = value
 			case "workspace":
 				t.WorkspaceName = value
+				// Optionally, if you decide to allow a "completed" tag, parse it here.
+				// case "completed":
+				//     d, err := time.Parse("2006-01-02", value)
+				//     if err != nil {
+				//         return t, fmt.Errorf("invalid completed_date format")
+				//     }
+				//     t.CompletedDate = d
 			}
 		}
 	}

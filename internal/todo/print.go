@@ -61,7 +61,7 @@ func DisplayTodos(todos []Todo) {
 	for i, t := range todos {
 		// Choose a colored status string.
 		var status string
-		if t.Completed {
+		if !t.CompletedDate.IsZero() {
 			status = completeStatus.Sprint("[x]")
 		} else {
 			status = incompleteStatus.Sprint("[ ]")
@@ -69,7 +69,7 @@ func DisplayTodos(todos []Todo) {
 
 		// Colorize the description differently if the task is completed.
 		var desc string
-		if t.Completed {
+		if !t.CompletedDate.IsZero() {
 			desc = descComplete.Sprint(t.Description)
 		} else {
 			desc = descIncomplete.Sprint(t.Description)

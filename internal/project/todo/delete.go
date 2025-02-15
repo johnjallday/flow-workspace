@@ -24,7 +24,7 @@ func Delete(todoFile string, reader *bufio.Reader) {
 	fmt.Println("All Tasks:")
 	for i, todo := range todos {
 		status := "[ ]"
-		if todo.Completed {
+		if !todo.CompletedDate.IsZero() {
 			status = "[x]"
 		}
 		fmt.Printf("%d. %s %s\n", i+1, status, todo.Description)
@@ -46,7 +46,7 @@ func Delete(todoFile string, reader *bufio.Reader) {
 	updatedContent += "# todo\n\n"
 	for _, todo := range todos {
 		status := "[ ]"
-		if todo.Completed {
+		if !todo.CompletedDate.IsZero() {
 			status = "[x]"
 		}
 		taskLine := fmt.Sprintf("- %s %s", status, todo.Description)
