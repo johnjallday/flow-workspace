@@ -12,5 +12,4 @@
 - [x] ws todo view only #created:2025-02-06 #project:flow-workspace #completed:2025-02-15
 - [x] project todo clean and auto add tags #completed:2025-02-15
 - [ ] smart todo tagger based on. Use openai to decide project and workspace #created:2025-02-02
-- [ ] cd convert to wav
-
+- [x] cd convert to wav #completed:2025-02-15
