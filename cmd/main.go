@@ -10,10 +10,13 @@ import (
 	projectTodo "github.com/johnjallday/flow-workspace/internal/project/todo"
 	"github.com/johnjallday/flow-workspace/internal/repl"
 	"github.com/johnjallday/flow-workspace/internal/root"
+	"github.com/johnjallday/flow-workspace/internal/startup"
 	"github.com/johnjallday/flow-workspace/internal/workspace"
 )
 
 func main() {
+	startup.StartDB() // call startDB() from the startup package
+
 	flag.Parse()
 	args := flag.Args()
 
