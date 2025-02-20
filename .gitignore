@@ -2,3 +2,4 @@ project_info.toml
 .DS_Store
 todo.md
 main
+build/
