@@ -7,6 +7,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"runtime"
 	"strings"
 
 	"github.com/johnjallday/flow-workspace/internal/project"
@@ -69,11 +70,18 @@ func StartREPL() {
 	}
 }
 
-// clearScreen clears the terminal screen.
 func clearScreen() {
-	cmd := exec.Command("clear") // Default for Unix/Linux/macOS
-	if strings.Contains(strings.ToLower(os.Getenv("OS")), "windows") {
-		cmd = exec.Command("cmd", "/c", "cls") // Windows equivalent
+	var cmd *exec.Cmd
+	switch runtime.GOOS {
+	case "linux":
+		cmd = exec.Command("clear") // Linux
+	case "windows":
+		cmd = exec.Command("cmd", "/c", "cls") // Windows
+	case "darwin":
+		cmd = exec.Command("clear") // macOS
+	default:
+		fmt.Println("CLS for", runtime.GOOS, "not implemented")
+		return
 	}
 	cmd.Stdout = os.Stdout
 	cmd.Run()

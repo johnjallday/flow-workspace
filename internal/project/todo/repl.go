@@ -4,28 +4,33 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"os/exec"
 	"path/filepath"
+	"runtime"
 	"strings"
 
 	todocommon "github.com/johnjallday/flow-workspace/internal/todo"
 )
 
-// Note: Do not redefine the Todo type here. Use todocommon.Todo everywhere.
+// reloadAndDisplay reloads todos from the given file and displays them.
+func reloadAndDisplay(todoFilePath string) {
+	todos, err := todocommon.LoadAllTodos(todoFilePath)
+	if err != nil {
+		fmt.Printf("Error reloading tasks from '%s': %v\n", todoFilePath, err)
+		return
+	}
+	todocommon.DisplayTodos(todos)
+}
 
 // StartTodoREPL is the interactive REPL for a single todo.md file.
 func StartTodoREPL(todoFilePath string) {
+	clearScreen()
 	reader := bufio.NewReader(os.Stdin)
 
 	fmt.Printf("TODO REPL started for file: %s\n", filepath.Base(todoFilePath))
-	printTodoHelp()
-
-	// Use the common package's LoadAllTodos function.
-	todos, err := todocommon.LoadAllTodos(todoFilePath)
-	if err != nil {
-		fmt.Printf("Error loading tasks from '%s': %v\n", todoFilePath, err)
-	}
-	// Use the common package's DisplayTodos function.
-	todocommon.DisplayTodos(todos)
+	// Initial load and display of todos.
+	printHelp()
+	reloadAndDisplay(todoFilePath)
 
 	for {
 		fmt.Printf("\n[todo:%s] >> ", filepath.Base(todoFilePath))
@@ -46,31 +51,45 @@ func StartTodoREPL(todoFilePath string) {
 			fmt.Println("Exiting TODO REPL. Goodbye!")
 			return
 		case "help":
-			printTodoHelp()
+			clearScreen()
+			printHelp()
 		case "list":
-			todos, err = todocommon.LoadAllTodos(todoFilePath)
-			if err != nil {
-				fmt.Printf("Error loading tasks from '%s': %v\n", todoFilePath, err)
-				continue
-			}
-			todocommon.DisplayTodos(todos)
+			clearScreen()
+			printHelp()
+			reloadAndDisplay(todoFilePath)
 		case "add":
+			clearScreen()
 			Add(filepath.Dir(todoFilePath))
+			printHelp()
+			reloadAndDisplay(todoFilePath)
 		case "complete":
+			clearScreen()
 			Complete(todoFilePath, reader)
+			printHelp()
+			reloadAndDisplay(todoFilePath)
 		case "delete":
+			clearScreen()
 			Delete(todoFilePath, reader)
+			printHelp()
+			reloadAndDisplay(todoFilePath)
 		case "edit":
+			clearScreen()
 			Edit(todoFilePath, reader)
+			printHelp()
+			reloadAndDisplay(todoFilePath)
 		case "weekly":
+			clearScreen()
 			fmt.Println("Running weekly review...")
+			// (Add any weekly review functionality here)
+			printHelp()
+			reloadAndDisplay(todoFilePath)
 		default:
 			fmt.Println("Unknown command. Type 'help' for available commands.")
 		}
 	}
 }
 
-func printTodoHelp() {
+func printHelp() {
 	fmt.Println(`Available commands (TODO REPL):
   list              - List all tasks
   add               - Add a new task
@@ -82,17 +101,19 @@ func printTodoHelp() {
   exit              - Exit the TODO REPL`)
 }
 
-// StartProjectTodoREPL launches the TODO REPL for a project directory.
-// It ensures that a todo.md exists in the given project directory.
-func StartProjectTodoREPL(projectDir string) {
-	todoFile := filepath.Join(projectDir, "todo.md")
-	if _, err := os.Stat(todoFile); os.IsNotExist(err) {
-		fmt.Printf("todo.md not found in '%s'. Creating one...\n", projectDir)
-		initialContent := "# todo\n\n"
-		if err := os.WriteFile(todoFile, []byte(initialContent), 0644); err != nil {
-			fmt.Printf("Failed to create todo.md: %v\n", err)
-			return
-		}
+func clearScreen() {
+	var cmd *exec.Cmd
+	switch runtime.GOOS {
+	case "linux":
+		cmd = exec.Command("clear") // Linux
+	case "windows":
+		cmd = exec.Command("cmd", "/c", "cls") // Windows
+	case "darwin":
+		cmd = exec.Command("clear") // macOS
+	default:
+		fmt.Println("CLS for", runtime.GOOS, "not implemented")
+		return
 	}
-	StartTodoREPL(todoFile)
+	cmd.Stdout = os.Stdout
+	cmd.Run()
 }

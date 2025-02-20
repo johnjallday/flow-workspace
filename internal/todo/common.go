@@ -118,16 +118,3 @@ func ReadFileContent(filename string) (string, error) {
 	return string(bytes), nil
 }
 
-// BackupFile creates a timestamped backup of the given file.
-func BackupFile(filename string) error {
-	timestamp := time.Now().Format("20060102_150405")
-	backupFilename := fmt.Sprintf("%s_backup_%s", filename, timestamp)
-	input, err := os.ReadFile(filename)
-	if err != nil {
-		return fmt.Errorf("failed to read original file: %w", err)
-	}
-	if err := os.WriteFile(backupFilename, input, 0644); err != nil {
-		return fmt.Errorf("failed to write backup file: %w", err)
-	}
-	return nil
-}
