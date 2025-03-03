@@ -16,7 +16,7 @@ import (
 )
 
 // StartREPL detects the appropriate REPL to launch and allows clearing the screen with Ctrl+L.
-func StartREPL() {
+func StartREPL(dbPath string) {
 	reader := bufio.NewReader(os.Stdin)
 
 	for {
@@ -28,19 +28,19 @@ func StartREPL() {
 		// Detect REPL scope and launch the appropriate one.
 		if info, err := os.Stat(filepath.Join(cwd, ".config")); err == nil && info.IsDir() {
 			fmt.Println("Detected .config folder. Launching Root REPL.")
-			root.StartRootREPL(cwd)
+			root.StartRootREPL(dbPath, cwd)
 			return
 		}
 
 		if _, err := os.Stat(filepath.Join(cwd, "ws_info.toml")); err == nil {
 			fmt.Println("Detected ws_info.toml. Launching Workspace REPL.")
-			workspace.StartWorkspaceREPL(cwd)
+			workspace.StartWorkspaceREPL(dbPath, cwd)
 			return
 		}
 
 		if _, err := os.Stat(filepath.Join(cwd, "project_info.toml")); err == nil {
 			fmt.Println("Detected project_info.toml. Launching Project REPL.")
-			project.StartProjectREPL(cwd)
+			project.StartProjectREPL(dbPath, cwd)
 			return
 		}
 

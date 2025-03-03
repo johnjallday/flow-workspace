@@ -25,7 +25,7 @@ func LaunchProject(projectDir string, sessionName string) error {
 
 	// 3. In the right pane (pane 1), send the command to open "todo.md" in vim.
 	// You can change "vim" to your preferred editor.
-	sendKeysCmd := exec.Command("tmux", "send-keys", "-t", sessionName+":0.1", "nvim todo.md", "C-m")
+	sendKeysCmd := exec.Command("tmux", "send-keys", "-t", sessionName+":0.1", "todo", "C-m")
 	if output, err := sendKeysCmd.CombinedOutput(); err != nil {
 		return fmt.Errorf("failed to send keys to tmux pane: %v - %s", err, strings.TrimSpace(string(output)))
 	}

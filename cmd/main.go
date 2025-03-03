@@ -15,7 +15,8 @@ import (
 )
 
 func main() {
-	startup.StartDB() // call startDB() from the startup package
+	dbPath := startup.StartDB() // call startDB() from the startup package
+	fmt.Println("Database path:", dbPath)
 
 	flag.Parse()
 	args := flag.Args()
@@ -64,7 +65,7 @@ func main() {
 			projectInfoPath := filepath.Join(dir, "project_info.toml")
 			if _, err := os.Stat(projectInfoPath); err == nil {
 				todoFilePath := filepath.Join(dir, "todo.md")
-				projectTodo.StartTodoREPL(todoFilePath)
+				projectTodo.StartTodoREPL(dbPath, todoFilePath)
 				return
 			}
 
@@ -78,5 +79,5 @@ func main() {
 	}
 
 	// No command provided: start the general scope-detecting REPL.
-	repl.StartREPL()
+	repl.StartREPL(dbPath)
 }

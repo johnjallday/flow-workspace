@@ -13,7 +13,7 @@ import (
 )
 
 // StartWorkspaceREPL starts an interactive REPL for the specified workspace directory.
-func StartWorkspaceREPL(workspaceDir string) {
+func StartWorkspaceREPL(dbPath string, workspaceDir string) {
 	reader := bufio.NewReader(os.Stdin)
 	// Extract the base folder name from workspaceDir.
 	currentWorkspace := filepath.Base(workspaceDir)
@@ -57,7 +57,7 @@ func StartWorkspaceREPL(workspaceDir string) {
 
 		case "select project":
 			// Let the user choose a project by number, then start the Project REPL
-			selectProject(workspaceDir, projs, reader)
+			selectProject(dbPath, workspaceDir, projs, reader)
 
 		case "update projects":
 			// Update projects by scanning the workspace.
@@ -89,7 +89,7 @@ func printWorkspaceHelp() {
 }
 
 // selectProject lets the user pick from the loaded Projects, then starts the Project REPL.
-func selectProject(workspaceDir string, projs *Projects, reader *bufio.Reader) {
+func selectProject(dbPath string, workspaceDir string, projs *Projects, reader *bufio.Reader) {
 	if projs == nil || len(projs.Projects) == 0 {
 		fmt.Println("No projects found in this workspace.")
 		return
@@ -133,7 +133,7 @@ func selectProject(workspaceDir string, projs *Projects, reader *bufio.Reader) {
 
 		fmt.Printf("Selected Project: %s\n", chosenProject.Name)
 		// Start the project-level REPL.
-		project.StartProjectREPL(projectDir)
+		project.StartProjectREPL(dbPath, projectDir)
 		return
 	}
 }

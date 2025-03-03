@@ -15,7 +15,7 @@ import (
 
 // StartRootREPL starts an interactive REPL at the root level.
 
-func StartRootREPL(rootDir string) {
+func StartRootREPL(dbPath string, rootDir string) {
 	fmt.Println("Welcome to the ROOT-level REPL!")
 	fmt.Printf("Root Directory: %s\n", rootDir)
 	printRootHelp()
@@ -52,7 +52,7 @@ func StartRootREPL(rootDir string) {
 			ListWorkspaces(rootDir)
 			selectedWorkspace := selectWorkspace(rootDir, reader)
 			if selectedWorkspace != "" {
-				workspace.StartWorkspaceREPL(selectedWorkspace)
+				workspace.StartWorkspaceREPL(dbPath, selectedWorkspace)
 			}
 
 		case "todo":

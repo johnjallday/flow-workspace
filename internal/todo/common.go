@@ -53,8 +53,11 @@ func parseTodo(line string) (Todo, error) {
 	var t Todo
 
 	if strings.HasPrefix(line, "- [x]") {
-		// Mark as completed; here we set the CompletedDate.
-		// You could use time.Now() or parse a date from a tag if available.
+		// If the task is completed but doesn't have a #completed tag, append it.
+		if !strings.Contains(line, "#completed:") {
+			line = line + fmt.Sprintf(" #completed:%s", time.Now().Format("2006-01-02"))
+		}
+		// Mark as completed.
 		t.CompletedDate = time.Now()
 		line = strings.TrimPrefix(line, "- [x]")
 	} else if strings.HasPrefix(line, "- [ ]") {
@@ -87,13 +90,13 @@ func parseTodo(line string) (Todo, error) {
 				t.ProjectName = value
 			case "workspace":
 				t.WorkspaceName = value
-				// Optionally, if you decide to allow a "completed" tag, parse it here.
-				// case "completed":
-				//     d, err := time.Parse("2006-01-02", value)
-				//     if err != nil {
-				//         return t, fmt.Errorf("invalid completed_date format")
-				//     }
-				//     t.CompletedDate = d
+			case "completed":
+				// If a #completed tag is present, use its date.
+				d, err := time.Parse("2006-01-02", value)
+				if err != nil {
+					return t, fmt.Errorf("invalid completed_date format")
+				}
+				t.CompletedDate = d
 			}
 		}
 	}
@@ -118,3 +121,47 @@ func ReadFileContent(filename string) (string, error) {
 	return string(bytes), nil
 }
 
+// SaveTodos writes the given slice of todos back to the specified file.
+// Each todo is formatted as a single line in the todo file.
+func SaveTodos(filename string, todos []Todo) error {
+	var lines []string
+
+	// Iterate over todos and build a string for each one.
+	for _, t := range todos {
+		var lineBuilder strings.Builder
+
+		// Mark as completed if CompletedDate is set.
+		if t.CompletedDate.IsZero() {
+			lineBuilder.WriteString("- [ ] ")
+		} else {
+			lineBuilder.WriteString("- [x] ")
+		}
+
+		// Write the description.
+		lineBuilder.WriteString(t.Description)
+
+		// Append tags for created, due, project, and workspace if available.
+		if !t.CreatedDate.IsZero() {
+			lineBuilder.WriteString(" #created:")
+			lineBuilder.WriteString(t.CreatedDate.Format("2006-01-02"))
+		}
+		if !t.DueDate.IsZero() {
+			lineBuilder.WriteString(" #due:")
+			lineBuilder.WriteString(t.DueDate.Format("2006-01-02"))
+		}
+		if t.ProjectName != "" {
+			lineBuilder.WriteString(" #project:")
+			lineBuilder.WriteString(t.ProjectName)
+		}
+		if t.WorkspaceName != "" {
+			lineBuilder.WriteString(" #workspace:")
+			lineBuilder.WriteString(t.WorkspaceName)
+		}
+
+		lines = append(lines, lineBuilder.String())
+	}
+
+	// Join all lines into a single string with newline separation.
+	content := strings.Join(lines, "\n")
+	return WriteFileContent(filename, content)
+}

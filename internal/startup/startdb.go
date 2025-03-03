@@ -77,7 +77,7 @@ func createDB(dbPath string, username string) {
 
 // StartDB determines the binary's directory, checks for an existing SQLite file,
 // and either prompts for a username to create one or opens an existing file.
-func StartDB() {
+func StartDB() string {
 	// Determine the directory of the binary.
 	exePath, err := os.Executable()
 	if err != nil {
@@ -122,4 +122,5 @@ func StartDB() {
 		}
 		fmt.Printf("Welcome %s!\n", storedUsername)
 	}
+	return dbPath
 }

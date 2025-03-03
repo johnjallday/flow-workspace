@@ -14,7 +14,7 @@ import (
 )
 
 // StartProjectREPL starts an interactive REPL for a single project directory.
-func StartProjectREPL(projectDir string) {
+func StartProjectREPL(dbPath string, projectDir string) {
 	clearScreen()
 	reader := bufio.NewReader(os.Stdin)
 	fmt.Printf("Project REPL started for directory: %s\n", projectDir)
@@ -38,7 +38,7 @@ func StartProjectREPL(projectDir string) {
 		case "todo":
 			// Exit the current REPL and then start the TODO REPL.
 			todoFile := filepath.Join(projectDir, "todo.md")
-			todo.StartTodoREPL(todoFile)
+			todo.StartTodoREPL(dbPath, todoFile)
 			return
 		case "launch":
 			LaunchProject(projectDir, "Project")
