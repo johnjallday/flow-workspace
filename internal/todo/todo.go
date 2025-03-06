@@ -10,4 +10,5 @@ type Todo struct {
 	DueDate       time.Time
 	ProjectName   string
 	WorkspaceName string
+	Ongoing       bool // true if the task is in progress
 }

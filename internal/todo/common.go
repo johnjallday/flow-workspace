@@ -50,6 +50,10 @@ func parseTodo(line string) (Todo, error) {
 		// Mark as completed.
 		t.CompletedDate = time.Now()
 		line = strings.TrimPrefix(line, "- [x]")
+	} else if strings.HasPrefix(line, "- [~]") {
+
+		t.Ongoing = true
+		line = strings.TrimPrefix(line, "- [~]")
 	} else if strings.HasPrefix(line, "- [ ]") {
 		// Not completed, leave CompletedDate as zero value.
 		line = strings.TrimPrefix(line, "- [ ]")
@@ -120,11 +124,13 @@ func SaveTodos(filename string, todos []Todo) error {
 	for _, t := range todos {
 		var lineBuilder strings.Builder
 
-		// Mark as completed if CompletedDate is set.
-		if t.CompletedDate.IsZero() {
-			lineBuilder.WriteString("- [ ] ")
-		} else {
+		// Use different marker based on task status.
+		if !t.CompletedDate.IsZero() {
 			lineBuilder.WriteString("- [x] ")
+		} else if t.Ongoing {
+			lineBuilder.WriteString("- [~] ")
+		} else {
+			lineBuilder.WriteString("- [ ] ")
 		}
 
 		// Write the description.

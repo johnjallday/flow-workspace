@@ -10,7 +10,7 @@ import (
 // TodoService defines the operations for managing TODO items.
 type TodoService interface {
 	AddTodo(description, dueDate string) error
-	EditTodo(index int, newDescription, newDueDate string) error
+	EditTodo(index int, newDescription, newDueDate, newStatus string) error
 	DeleteTodo(index int) error
 	CompleteTodo(index int) error
 	ListTodos() ([]Todo, error)
@@ -67,8 +67,8 @@ func (s *FileTodoService) ListTodos() ([]Todo, error) {
 	return LoadAllTodos(s.todoFilePath)
 }
 
-// EditTodo updates the description and/or due date of the task at the given index.
-func (s *FileTodoService) EditTodo(index int, newDescription, newDueDate string) error {
+// EditTodo updates the description, due date, and/or status of the task at the given index.
+func (s *FileTodoService) EditTodo(index int, newDescription, newDueDate, newStatus string) error {
 	todos, err := LoadAllTodos(s.todoFilePath)
 	if err != nil {
 		return fmt.Errorf("error loading tasks: %w", err)
@@ -79,9 +79,12 @@ func (s *FileTodoService) EditTodo(index int, newDescription, newDueDate string)
 	}
 
 	selectedTask := todos[index]
+	// Update description if provided.
 	if newDescription != "" {
 		selectedTask.Description = newDescription
 	}
+
+	// Update due date if provided.
 	if newDueDate != "" {
 		parsedDate, err := time.Parse("2006-01-02", newDueDate)
 		if err != nil {
@@ -89,8 +92,26 @@ func (s *FileTodoService) EditTodo(index int, newDescription, newDueDate string)
 		}
 		selectedTask.DueDate = parsedDate
 	}
+
+	// Update status if provided.
+	if newStatus != "" {
+		switch strings.ToLower(newStatus) {
+		case "ongoing":
+			selectedTask.Ongoing = true
+			// Clear any completion date if marking as ongoing.
+			selectedTask.CompletedDate = time.Time{}
+		case "complete":
+			selectedTask.CompletedDate = time.Now()
+			selectedTask.Ongoing = false
+		default:
+			return fmt.Errorf("invalid status option: %s", newStatus)
+		}
+	}
+
+	// Update the task in the slice.
 	todos[index] = selectedTask
 
+	// Save the updated todos back to the todo.md file.
 	return SaveTodos(s.todoFilePath, todos)
 }
 
@@ -126,5 +147,6 @@ func (s *FileTodoService) CompleteTodo(index int) error {
 	}
 
 	todos[index].CompletedDate = time.Now()
+	todos[index].Ongoing = false
 	return SaveTodos(s.todoFilePath, todos)
 }

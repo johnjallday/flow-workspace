@@ -162,7 +162,14 @@ func StartTodoREPL(dbPath string, todoFilePath string) {
 				continue
 			}
 			newDueDate = strings.TrimSpace(newDueDate)
-			if err := service.EditTodo(index-1, newDescription, newDueDate); err != nil {
+			fmt.Print("Enter new status (ongoing/complete, leave empty to keep current): ")
+			newStatus, err := reader.ReadString('\n')
+			if err != nil {
+				fmt.Println("Error reading status:", err)
+				continue
+			}
+			newStatus = strings.TrimSpace(newStatus)
+			if err := service.EditTodo(index-1, newDescription, newDueDate, newStatus); err != nil {
 				fmt.Println("Error editing task:", err)
 			} else {
 				fmt.Println("Task edited successfully.")
@@ -184,7 +191,7 @@ func printHelp() {
   add       - Add a new task
   complete  - Mark a task as completed
   delete    - Delete a task
-  edit      - Edit a task
+  edit      - Edit a task (update description, due date, and/or status)
   weekly    - Run the weekly review for this TODO file
   exit      - Exit the TODO REPL`)
 }

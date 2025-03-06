@@ -1,4 +1,3 @@
-// internal/todo/print.go
 package todo
 
 import (
@@ -43,6 +42,7 @@ func PrintTodos(todos []Todo) {
 
 	// Define color styles.
 	completeStatus := color.New(color.FgGreen)
+	ongoingStatus := color.New(color.FgYellow) // Added ongoing status color style.
 	incompleteStatus := color.New(color.FgRed)
 	descIncomplete := color.New(color.FgWhite, color.Bold)
 	descComplete := color.New(color.FgHiBlack)
@@ -63,6 +63,8 @@ func PrintTodos(todos []Todo) {
 		var status string
 		if !t.CompletedDate.IsZero() {
 			status = completeStatus.Sprint("[x]")
+		} else if t.Ongoing { // New condition for ongoing tasks.
+			status = ongoingStatus.Sprint("[~]")
 		} else {
 			status = incompleteStatus.Sprint("[ ]")
 		}
