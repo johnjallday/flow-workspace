@@ -11,11 +11,3 @@ type Todo struct {
 	ProjectName   string
 	WorkspaceName string
 }
-
-// Manager defines the operations you expect on todos.
-type Manager interface {
-	LoadAllTodos() ([]Todo, error)
-	SaveTodos(todos []Todo) error
-	AddTodo(todo Todo) error
-	DeleteTodo(index int) error
-}

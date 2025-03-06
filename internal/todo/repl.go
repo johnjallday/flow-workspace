@@ -5,44 +5,44 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 
 	db "github.com/johnjallday/flow-workspace/internal/db/todo"
 	_ "github.com/mattn/go-sqlite3" // SQLite driver
 )
 
-// reloadAndDisplay reloads todos from the given file and displays them.
-func reloadAndDisplay(todoFilePath string) {
-	todos, err := LoadAllTodos(todoFilePath)
-	if err != nil {
-		fmt.Printf("Error reloading tasks from '%s': %v\n", todoFilePath, err)
-		return
-	}
-	PrintTodos(todos)
-}
-
-// StartTodoREPL is the interactive REPL for a single todo.md file.
+// StartTodoREPL is the interactive REPL for a single todo.md file using TodoService.
 func StartTodoREPL(dbPath string, todoFilePath string) {
 	reader := bufio.NewReader(os.Stdin)
 
+	// Initialize the database.
 	mydb, err := db.InitDB(dbPath)
-	// Use our local initDB function to connect to the database.
 	if err != nil {
 		fmt.Println("Error connecting to db:", err)
 		return
 	}
 
+	// Migrate finished todos from the file to the database.
 	MigrateFinishedTodos(todoFilePath, mydb)
-	// Initial load and display of todos.
+
+	// Create an instance of TodoService.
+	service := NewFileTodoService(todoFilePath)
+
+	// REPL loop.
 	for {
-
 		clearScreen()
-
 		fmt.Println("dbPath:", dbPath)
-
-		// Migrate finished todos using the provided function from the db package.
 		printHelp()
-		reloadAndDisplay(todoFilePath)
+
+		// List current todos.
+		todos, err := service.ListTodos()
+		if err != nil {
+			fmt.Printf("Error loading todos: %v\n", err)
+		} else {
+			PrintTodos(todos)
+		}
+
 		fmt.Printf("\n[todo:%s] >> ", filepath.Base(todoFilePath))
 		line, err := reader.ReadString('\n')
 		if err != nil {
@@ -53,7 +53,6 @@ func StartTodoREPL(dbPath string, todoFilePath string) {
 		if line == "" {
 			continue
 		}
-
 		parts := strings.SplitN(line, " ", 2)
 		command := strings.ToLower(parts[0])
 
@@ -62,30 +61,132 @@ func StartTodoREPL(dbPath string, todoFilePath string) {
 			fmt.Println("Exiting TODO REPL. Goodbye!")
 			return
 		case "add":
-			Add(filepath.Dir(todoFilePath))
+			// Prompt for description and due date.
+			fmt.Print("Enter task description: ")
+			description, err := reader.ReadString('\n')
+			if err != nil {
+				fmt.Println("Error reading description:", err)
+				continue
+			}
+			description = strings.TrimSpace(description)
+			if description == "" {
+				fmt.Println("Task description cannot be empty.")
+				continue
+			}
+
+			fmt.Print("Enter due date (YYYY-MM-DD) or leave empty: ")
+			dueDate, err := reader.ReadString('\n')
+			if err != nil {
+				fmt.Println("Error reading due date:", err)
+				continue
+			}
+			dueDate = strings.TrimSpace(dueDate)
+
+			if err := service.AddTodo(description, dueDate); err != nil {
+				fmt.Println("Error adding task:", err)
+			} else {
+				fmt.Println("Task added successfully.")
+			}
 		case "complete":
-			Complete(todoFilePath, reader)
+			if len(todos) == 0 {
+				fmt.Println("No tasks available to complete.")
+				break
+			}
+			fmt.Print("Enter the task number to complete: ")
+			input, err := reader.ReadString('\n')
+			if err != nil {
+				fmt.Println("Error reading input:", err)
+				continue
+			}
+			input = strings.TrimSpace(input)
+			index, err := strconv.Atoi(input)
+			if err != nil || index < 1 || index > len(todos) {
+				fmt.Println("Invalid task number.")
+				continue
+			}
+			if err := service.CompleteTodo(index - 1); err != nil {
+				fmt.Println("Error completing task:", err)
+			} else {
+				fmt.Println("Task marked as completed.")
+			}
 		case "delete":
-			Delete(todoFilePath, reader)
+			if len(todos) == 0 {
+				fmt.Println("No tasks available to delete.")
+				break
+			}
+			fmt.Print("Enter the task number to delete: ")
+			input, err := reader.ReadString('\n')
+			if err != nil {
+				fmt.Println("Error reading input:", err)
+				continue
+			}
+			input = strings.TrimSpace(input)
+			index, err := strconv.Atoi(input)
+			if err != nil || index < 1 || index > len(todos) {
+				fmt.Println("Invalid task number.")
+				continue
+			}
+			if err := service.DeleteTodo(index - 1); err != nil {
+				fmt.Println("Error deleting task:", err)
+			} else {
+				fmt.Println("Task deleted successfully.")
+			}
 		case "edit":
-			Edit(todoFilePath, reader)
+			if len(todos) == 0 {
+				fmt.Println("No tasks available to edit.")
+				break
+			}
+			fmt.Print("Enter the task number to edit: ")
+			input, err := reader.ReadString('\n')
+			if err != nil {
+				fmt.Println("Error reading input:", err)
+				continue
+			}
+			input = strings.TrimSpace(input)
+			index, err := strconv.Atoi(input)
+			if err != nil || index < 1 || index > len(todos) {
+				fmt.Println("Invalid task number.")
+				continue
+			}
+			fmt.Print("Enter new description (leave empty to keep current): ")
+			newDescription, err := reader.ReadString('\n')
+			if err != nil {
+				fmt.Println("Error reading description:", err)
+				continue
+			}
+			newDescription = strings.TrimSpace(newDescription)
+			fmt.Print("Enter new due date (YYYY-MM-DD, leave empty to keep current): ")
+			newDueDate, err := reader.ReadString('\n')
+			if err != nil {
+				fmt.Println("Error reading due date:", err)
+				continue
+			}
+			newDueDate = strings.TrimSpace(newDueDate)
+			if err := service.EditTodo(index-1, newDescription, newDueDate); err != nil {
+				fmt.Println("Error editing task:", err)
+			} else {
+				fmt.Println("Task edited successfully.")
+			}
 		case "weekly":
 			fmt.Println("Running weekly review...")
-			// (Add any weekly review functionality here)
+			// (Add any weekly review functionality here.)
 		default:
 			fmt.Println("Unknown command. Type 'help' for available commands.")
 		}
+
+		fmt.Print("Press Enter to continue...")
+		_, _ = reader.ReadString('\n')
 	}
 }
 
 func printHelp() {
 	fmt.Println(`Available commands (TODO REPL):
-  add               - Add a new task
-  complete          - Mark a task as completed
-  delete            - Delete a task
-  edit              - Edit a task
-  weekly            - Run the weekly review for this TODO file
-  exit              - Exit the TODO REPL`)
+  add       - Add a new task
+  complete  - Mark a task as completed
+  delete    - Delete a task
+  edit      - Edit a task
+  weekly    - Run the weekly review for this TODO file
+  exit      - Exit the TODO REPL`)
 }
 
 func clearScreen() {
