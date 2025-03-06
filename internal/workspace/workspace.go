@@ -280,5 +280,5 @@ func ListAllTodos(workspaceDir string) {
 		return
 	}
 
-	todo.DisplayTodos(aggregatedTodos)
+	todo.PrintTodos(aggregatedTodos)
 }

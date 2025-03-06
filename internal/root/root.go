@@ -186,5 +186,5 @@ func ListAllTodos(rootDir string) {
 
 	fmt.Println("\nAggregated TODOs across all Workspaces:")
 
-	todo.DisplayTodos(aggregatedTodos)
+	todo.PrintTodos(aggregatedTodos)
 }

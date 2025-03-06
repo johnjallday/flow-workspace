@@ -7,8 +7,6 @@ import (
 	"path/filepath"
 	"strings"
 	"time"
-
-	"github.com/johnjallday/flow-workspace/internal/todo"
 )
 
 // Add creates a new task and appends it to the todo.md file located in projectPath.
@@ -18,7 +16,7 @@ func Add(projectPath string) error {
 	// If 'todo.md' does not exist, create it with a "# todo" header.
 	if _, err := os.Stat(todoFile); os.IsNotExist(err) {
 		initialContent := "# todo\n\n"
-		if err := todo.WriteFileContent(todoFile, initialContent); err != nil {
+		if err := WriteFileContent(todoFile, initialContent); err != nil {
 			return fmt.Errorf("failed to create 'todo.md': %w", err)
 		}
 	}
@@ -66,7 +64,7 @@ func Add(projectPath string) error {
 	taskLine := buildTaskLine(description, dueDate, projectName, workspaceName)
 
 	// Read existing content.
-	content, err := todo.ReadFileContent(todoFile)
+	content, err := ReadFileContent(todoFile)
 	if err != nil {
 		return fmt.Errorf("failed to read '%s': %w", todoFile, err)
 	}
@@ -89,7 +87,7 @@ func Add(projectPath string) error {
 	updatedContent := strings.Join(newLines, "\n")
 
 	// Write updated content back to the file.
-	if err := todo.WriteFileContent(todoFile, updatedContent); err != nil {
+	if err := WriteFileContent(todoFile, updatedContent); err != nil {
 		return fmt.Errorf("failed to write to '%s': %w", todoFile, err)
 	}
 

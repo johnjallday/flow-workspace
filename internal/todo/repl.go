@@ -8,18 +8,17 @@ import (
 	"strings"
 
 	db "github.com/johnjallday/flow-workspace/internal/db/todo"
-	todocommon "github.com/johnjallday/flow-workspace/internal/todo"
 	_ "github.com/mattn/go-sqlite3" // SQLite driver
 )
 
 // reloadAndDisplay reloads todos from the given file and displays them.
 func reloadAndDisplay(todoFilePath string) {
-	todos, err := todocommon.LoadAllTodos(todoFilePath)
+	todos, err := LoadAllTodos(todoFilePath)
 	if err != nil {
 		fmt.Printf("Error reloading tasks from '%s': %v\n", todoFilePath, err)
 		return
 	}
-	todocommon.DisplayTodos(todos)
+	PrintTodos(todos)
 }
 
 // StartTodoREPL is the interactive REPL for a single todo.md file.
@@ -33,7 +32,7 @@ func StartTodoREPL(dbPath string, todoFilePath string) {
 		return
 	}
 
-	todocommon.MigrateFinishedTodos(todoFilePath, mydb)
+	MigrateFinishedTodos(todoFilePath, mydb)
 	// Initial load and display of todos.
 	for {
 

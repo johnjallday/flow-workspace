@@ -12,7 +12,7 @@ import (
 
 // DisplayTodos prints the list of TODOs in a formatted, colorized table.
 // The output adapts based on the terminal width.
-func DisplayTodos(todos []Todo) {
+func PrintTodos(todos []Todo) {
 	// Determine the terminal width.
 	width, _, err := term.GetSize(int(os.Stdout.Fd()))
 	if err != nil {

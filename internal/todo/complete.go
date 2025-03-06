@@ -6,13 +6,11 @@ import (
 	"strconv"
 	"strings"
 	"time"
-
-	"github.com/johnjallday/flow-workspace/internal/todo"
 )
 
 func Complete(todoFile string, reader *bufio.Reader) {
 	// Load all tasks from the file.
-	tasks, err := todo.LoadAllTodos(todoFile)
+	tasks, err := LoadAllTodos(todoFile)
 	if err != nil {
 		fmt.Println("Error loading tasks:", err)
 		return
@@ -25,7 +23,7 @@ func Complete(todoFile string, reader *bufio.Reader) {
 
 	// Filter out incomplete tasks (i.e. tasks with a zero CompletedDate).
 	fmt.Println("Incomplete Tasks:")
-	var incompleteTasks []todo.Todo
+	var incompleteTasks []Todo
 	for _, task := range tasks {
 		if task.CompletedDate.IsZero() {
 			incompleteTasks = append(incompleteTasks, task)
@@ -111,7 +109,7 @@ func Complete(todoFile string, reader *bufio.Reader) {
 	}
 
 	// Write the updated content back to the file.
-	if err := todo.WriteFileContent(todoFile, updatedContent); err != nil {
+	if err := WriteFileContent(todoFile, updatedContent); err != nil {
 		fmt.Println("Error writing to 'todo.md':", err)
 		return
 	}

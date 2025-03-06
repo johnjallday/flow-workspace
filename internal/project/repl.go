@@ -10,7 +10,7 @@ import (
 	"strings"
 
 	"github.com/johnjallday/flow-workspace/internal/agent"
-	"github.com/johnjallday/flow-workspace/internal/project/todo"
+	"github.com/johnjallday/flow-workspace/internal/todo"
 )
 
 // StartProjectREPL starts an interactive REPL for a single project directory.

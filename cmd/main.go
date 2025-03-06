@@ -7,11 +7,12 @@ import (
 	"os"
 	"path/filepath"
 
-	projectTodo "github.com/johnjallday/flow-workspace/internal/project/todo"
 	"github.com/johnjallday/flow-workspace/internal/repl"
 	"github.com/johnjallday/flow-workspace/internal/root"
 	"github.com/johnjallday/flow-workspace/internal/startup"
 	"github.com/johnjallday/flow-workspace/internal/workspace"
+
+	"github.com/johnjallday/flow-workspace/internal/todo"
 )
 
 func main() {
@@ -65,7 +66,7 @@ func main() {
 			projectInfoPath := filepath.Join(dir, "project_info.toml")
 			if _, err := os.Stat(projectInfoPath); err == nil {
 				todoFilePath := filepath.Join(dir, "todo.md")
-				projectTodo.StartTodoREPL(dbPath, todoFilePath)
+				todo.StartTodoREPL(dbPath, todoFilePath)
 				return
 			}
 

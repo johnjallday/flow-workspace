@@ -6,12 +6,10 @@ import (
 	"strconv"
 	"strings"
 	"time"
-
-	"github.com/johnjallday/flow-workspace/internal/todo"
 )
 
 func Edit(todoFile string, reader *bufio.Reader) {
-	todos, err := todo.LoadAllTodos(todoFile)
+	todos, err := LoadAllTodos(todoFile)
 	if err != nil {
 		fmt.Println("Error loading tasks:", err)
 		return
@@ -91,7 +89,7 @@ func Edit(todoFile string, reader *bufio.Reader) {
 		updatedContent += taskLine
 	}
 
-	if err := todo.WriteFileContent(todoFile, updatedContent); err != nil {
+	if err := WriteFileContent(todoFile, updatedContent); err != nil {
 		fmt.Println("Error writing to 'todo.md':", err)
 		return
 	}
