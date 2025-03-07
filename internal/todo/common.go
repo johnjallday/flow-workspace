@@ -12,6 +12,7 @@ import (
 var tagRegex = regexp.MustCompile(`#(\w+):([^\s#]+)`)
 
 // LoadAllTodos reads a todo file (e.g. "todo.md") and parses its tasks.
+// If a completed task is missing the "#completed" tag, it updates the line and re-saves the file.
 func LoadAllTodos(filename string) ([]Todo, error) {
 	content, err := os.ReadFile(filename)
 	if err != nil {
@@ -20,19 +21,35 @@ func LoadAllTodos(filename string) ([]Todo, error) {
 
 	lines := strings.Split(string(content), "\n")
 	var todos []Todo
+	modified := false // flag to indicate if any line was updated
 
-	for _, line := range lines {
-		line = strings.TrimSpace(line)
+	for i, line := range lines {
+		trimmed := strings.TrimSpace(line)
 		// Skip blank lines or comments.
-		if line == "" || strings.HasPrefix(line, "#") {
+		if trimmed == "" || strings.HasPrefix(trimmed, "#") {
 			continue
 		}
-		t, err := parseTodo(line)
+		t, err := parseTodo(trimmed)
 		if err != nil {
-			fmt.Printf("Skipping invalid task line: %s\n", line)
+			fmt.Printf("Skipping invalid task line: %s\n", trimmed)
 			continue
 		}
 		todos = append(todos, t)
+		// For completed tasks, check if the original line is missing the "#completed" tag.
+		if !t.CompletedDate.IsZero() && !strings.Contains(line, "#completed:") {
+			// Replace the line with the correctly formatted one.
+			lines[i] = formatTodo(t)
+			modified = true
+		}
+	}
+
+	// If any modifications were made, re-save the file with updated completed tags.
+	if modified {
+		newContent := strings.Join(lines, "\n")
+		err = WriteFileContent(filename, newContent)
+		if err != nil {
+			return todos, fmt.Errorf("failed to update file with completed tags: %w", err)
+		}
 	}
 
 	return todos, nil
@@ -154,10 +171,58 @@ func SaveTodos(filename string, todos []Todo) error {
 			lineBuilder.WriteString(t.WorkspaceName)
 		}
 
+		// Append the "#completed" tag if the task is complete.
+		if !t.CompletedDate.IsZero() {
+			lineBuilder.WriteString(" #completed:")
+			lineBuilder.WriteString(t.CompletedDate.Format("2006-01-02"))
+		}
+
 		lines = append(lines, lineBuilder.String())
 	}
 
 	// Join all lines into a single string with newline separation.
 	content := strings.Join(lines, "\n")
 	return WriteFileContent(filename, content)
+}
+
+// formatTodo builds and returns a markdown-formatted string for a Todo.
+// It includes markers and tags, appending a "#completed" tag for completed tasks.
+func formatTodo(t Todo) string {
+	var lineBuilder strings.Builder
+
+	// Use different marker based on task status.
+	if !t.CompletedDate.IsZero() {
+		lineBuilder.WriteString("- [x] ")
+	} else if t.Ongoing {
+		lineBuilder.WriteString("- [~] ")
+	} else {
+		lineBuilder.WriteString("- [ ] ")
+	}
+
+	// Write the description.
+	lineBuilder.WriteString(t.Description)
+
+	// Append tags for created, due, project, and workspace if available.
+	if !t.CreatedDate.IsZero() {
+		lineBuilder.WriteString(" #created:")
+		lineBuilder.WriteString(t.CreatedDate.Format("2006-01-02"))
+	}
+	if !t.DueDate.IsZero() {
+		lineBuilder.WriteString(" #due:")
+		lineBuilder.WriteString(t.DueDate.Format("2006-01-02"))
+	}
+	if t.ProjectName != "" {
+		lineBuilder.WriteString(" #project:")
+		lineBuilder.WriteString(t.ProjectName)
+	}
+	if t.WorkspaceName != "" {
+		lineBuilder.WriteString(" #workspace:")
+		lineBuilder.WriteString(t.WorkspaceName)
+	}
+	// Append the "#completed" tag if the task is completed.
+	if !t.CompletedDate.IsZero() {
+		lineBuilder.WriteString(" #completed:")
+		lineBuilder.WriteString(t.CompletedDate.Format("2006-01-02"))
+	}
+	return lineBuilder.String()
 }

@@ -1,0 +1,10 @@
+- [ ] delete all project_info tags #project:flow-workspace #workspace:johnj-programming #created:2025-03-07
+- [ ] project tag path update #project:flow-workspace #workspace:johnj-programming #created:2025-03-07
+- [ ] workspace update projects #created:2025-03-06 #project:flow-workspace #workspace:johnj-programming
+- [x] todo status on-going update #created:2025-03-06 #project:flow-workspace #workspace:johnj-programming #completed:2025-03-07
+- [x] refactor todo interface #created:2025-03-03 #project:flow-workspace #workspace:johnj-programming #completed:2025-03-07
+- [x] completed todo migration #created:2025-03-03 #project:flow-workspace #workspace:johnj-programming #completed:2025-03-07
+- [ ] command interface #created:2025-02-22 #project:flow-workspace #workspace:johnj-programming
+- [~] weekly review #created:2025-02-20 #project:flow-workspace #workspace:johnj-programming
+- [ ] projects and workspace table sqlite #created:2025-02-20 #project:flow-workspace #workspace:johnj-programming
+- [ ] initial config management for installation #created:2025-02-20 #project:flow-workspace #workspace:johnj-programming

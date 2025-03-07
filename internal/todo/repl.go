@@ -176,6 +176,7 @@ func StartTodoREPL(dbPath string, todoFilePath string) {
 			}
 		case "weekly":
 			fmt.Println("Running weekly review...")
+			ReviewWeekly(todos)
 			// (Add any weekly review functionality here.)
 		default:
 			fmt.Println("Unknown command. Type 'help' for available commands.")
