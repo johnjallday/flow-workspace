@@ -1,3 +1,4 @@
+- [x] coder agent integration #created:2025-03-08 #project:flow-workspace #workspace:johnj-programming #completed:2025-03-08
 - [x] print todo in project repl #created:2025-03-08 #project:flow-workspace #workspace:johnj-programming #completed:2025-03-08
 - [ ] import project #created:2025-03-08 #project:flow-workspace #workspace:johnj-programming
 - [ ] create new project #created:2025-03-08 #project:flow-workspace #workspace:johnj-programming
