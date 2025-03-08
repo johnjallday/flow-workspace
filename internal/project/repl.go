@@ -16,6 +16,16 @@ import (
 // StartProjectREPL starts an interactive REPL for a single project directory.
 func StartProjectREPL(dbPath string, projectDir string) {
 	clearScreen()
+
+	todoFile := filepath.Join(projectDir, "todo.md")
+	service := todo.NewFileTodoService(todoFile)
+	todos, err := service.ListTodos()
+	if err != nil {
+		fmt.Printf("Error loading todos: %v\n", err)
+	} else {
+		todo.PrintTodos(todos)
+	}
+
 	reader := bufio.NewReader(os.Stdin)
 	fmt.Printf("Project REPL started for directory: %s\n", projectDir)
 	printProjectHelp()
