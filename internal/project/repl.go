@@ -22,7 +22,6 @@ func StartProjectREPL(dbPath string, projectDir string) {
 		clearScreen()
 
 		todoFile := filepath.Join(projectDir, "todo.md")
-
 		service := todo.NewFileTodoService(todoFile)
 		todos, err := service.ListTodos()
 		if err != nil {
@@ -46,15 +45,27 @@ func StartProjectREPL(dbPath string, projectDir string) {
 			implementTodo(service, coderPath, reader)
 		case "finish":
 			finishTodo(service, coderPath, reader)
-		case "exit":
-			fmt.Println("Exiting Project REPL. Goodbye!")
-			return
+
+		case "edit":
+			// Assume the project metadata file is "project_info.toml" in the project directory.
+			metaFile := filepath.Join(projectDir, "project_info.toml")
+			if err := editProjectInfo(metaFile); err != nil {
+				fmt.Printf("Error editing project info: %v\n", err)
+			}
+			// Wait for a key press after editing.
+			fmt.Println("Press Enter to continue...")
+			reader.ReadString('\n')
 		case "todo":
 			todoFile := filepath.Join(projectDir, "todo.md")
 			todo.StartTodoREPL(dbPath, todoFile)
 			return
+		case "exit":
+			fmt.Println("Exiting Project REPL. Goodbye!")
+			return
 		default:
 			fmt.Println("Unknown command. Type 'help' for available commands.")
+			fmt.Println("Press Enter to continue...")
+			reader.ReadString('\n')
 		}
 	}
 }
@@ -116,18 +127,17 @@ func printProjectHelp() {
   launch    - Launch the project
   implement - Implement a todo
   finish    - Mark a todo as complete
+  edit      - Edit project tags
   exit      - Exit the Project REPL`)
 }
 
 func clearScreen() {
 	var cmd *exec.Cmd
 	switch runtime.GOOS {
-	case "linux":
+	case "linux", "darwin":
 		cmd = exec.Command("clear")
 	case "windows":
 		cmd = exec.Command("cmd", "/c", "cls")
-	case "darwin":
-		cmd = exec.Command("clear")
 	default:
 		fmt.Println("CLS for", runtime.GOOS, "not implemented")
 		return

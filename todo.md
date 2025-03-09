@@ -1,9 +1,9 @@
+- [x] editTag #created:2025-03-08 #project:flow-workspace #workspace:johnj-programming #completed:2025-03-09
 - [x] coder agent integration #created:2025-03-08 #project:flow-workspace #workspace:johnj-programming #completed:2025-03-08
 - [x] print todo in project repl #created:2025-03-08 #project:flow-workspace #workspace:johnj-programming #completed:2025-03-08
 - [ ] import project #created:2025-03-08 #project:flow-workspace #workspace:johnj-programming
 - [ ] create new project #created:2025-03-08 #project:flow-workspace #workspace:johnj-programming
 - [ ] project_info tag date_modified algorithm #created:2025-03-08 #project:flow-workspace #workspace:johnj-programming
-- [x] project tag path update #created:2025-03-07 #project:flow-workspace #workspace:johnj-programming #completed:2025-03-08
 - [ ] workspace update projects #created:2025-03-06 #project:flow-workspace #workspace:johnj-programming
 - [x] todo status on-going update #created:2025-03-06 #project:flow-workspace #workspace:johnj-programming #completed:2025-03-07
 - [x] refactor todo interface #created:2025-03-03 #project:flow-workspace #workspace:johnj-programming #completed:2025-03-07
