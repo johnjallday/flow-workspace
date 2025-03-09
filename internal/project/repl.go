@@ -21,12 +21,32 @@ func StartProjectREPL(dbPath string, projectDir string) {
 	for {
 		clearScreen()
 
-		// Load and print project info.
+		// Determine the metadata file path.
 		metaFile := filepath.Join(projectDir, "project_info.toml")
+		var proj *Project
 		proj, err := LoadProjectInfo(metaFile)
 		if err != nil {
-			fmt.Printf("Error loading project info: %v\n", err)
-		} else {
+			if os.IsNotExist(err) {
+				fmt.Println("project_info.toml not found.")
+				fmt.Print("Would you like to import this directory? (y/n): ")
+				answer, _ := reader.ReadString('\n')
+				answer = strings.TrimSpace(strings.ToLower(answer))
+				if answer == "y" || answer == "yes" {
+					if err := ImportProject(projectDir); err != nil {
+						fmt.Printf("Error importing project: %v\n", err)
+					} else {
+						// Try to load project info again.
+						proj, err = LoadProjectInfo(metaFile)
+						if err != nil {
+							fmt.Printf("Error loading project info after import: %v\n", err)
+						}
+					}
+				}
+			} else {
+				fmt.Printf("Error loading project info: %v\n", err)
+			}
+		}
+		if proj != nil {
 			printProjectInfo(proj)
 		}
 
@@ -93,7 +113,17 @@ func printProjectInfo(proj *Project) {
 	fmt.Println("====================================")
 }
 
-// The rest of your functions remain unchanged...
+// Updated help menu.
+func printProjectHelp() {
+	fmt.Println(`Available commands (Project REPL):
+  todo      - Open the TODO REPL for this project (exits Project REPL)
+  launch    - Launch the project
+  implement - Implement a todo
+  finish    - Mark a todo as complete
+  edit      - Edit project info (tags, notes, name, alias, project type)
+  exit      - Exit the Project REPL`)
+}
+
 func implementTodo(service *todo.FileTodoService, coderPath string, reader *bufio.Reader) {
 	executeTodoCommand(service, coderPath, reader, "ongoing", "implement", "create")
 }
@@ -143,16 +173,6 @@ func executeTodoCommand(service *todo.FileTodoService, coderPath string, reader 
 	} else {
 		fmt.Printf("Command '%s %s' executed successfully!\n", command, action)
 	}
-}
-
-func printProjectHelp() {
-	fmt.Println(`Available commands (Project REPL):
-  todo      - Open the TODO REPL for this project (exits Project REPL)
-  launch    - Launch the project
-  implement - Implement a todo
-  finish    - Mark a todo as complete
-  edit      - Edit project info (tags, notes, name, alias, project type)
-  exit      - Exit the Project REPL`)
 }
 
 func clearScreen() {
