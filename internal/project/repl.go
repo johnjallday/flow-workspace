@@ -21,6 +21,16 @@ func StartProjectREPL(dbPath string, projectDir string) {
 	for {
 		clearScreen()
 
+		// Load and print project info.
+		metaFile := filepath.Join(projectDir, "project_info.toml")
+		proj, err := LoadProjectInfo(metaFile)
+		if err != nil {
+			fmt.Printf("Error loading project info: %v\n", err)
+		} else {
+			printProjectInfo(proj)
+		}
+
+		// Load and print todos.
 		todoFile := filepath.Join(projectDir, "todo.md")
 		service := todo.NewFileTodoService(todoFile)
 		todos, err := service.ListTodos()
@@ -45,18 +55,14 @@ func StartProjectREPL(dbPath string, projectDir string) {
 			implementTodo(service, coderPath, reader)
 		case "finish":
 			finishTodo(service, coderPath, reader)
-
 		case "edit":
-			// Assume the project metadata file is "project_info.toml" in the project directory.
-			metaFile := filepath.Join(projectDir, "project_info.toml")
+			// Use the project metadata file.
 			if err := editProjectInfo(metaFile); err != nil {
 				fmt.Printf("Error editing project info: %v\n", err)
 			}
-			// Wait for a key press after editing.
 			fmt.Println("Press Enter to continue...")
 			reader.ReadString('\n')
 		case "todo":
-			todoFile := filepath.Join(projectDir, "todo.md")
 			todo.StartTodoREPL(dbPath, todoFile)
 			return
 		case "exit":
@@ -70,6 +76,24 @@ func StartProjectREPL(dbPath string, projectDir string) {
 	}
 }
 
+// printProjectInfo displays key project metadata on the screen.
+func printProjectInfo(proj *Project) {
+	fmt.Println("====================================")
+	fmt.Println("Project Info:")
+	fmt.Println("Name:         ", proj.Name)
+	fmt.Println("Alias:        ", proj.Alias)
+	fmt.Println("Project Type: ", proj.ProjectType)
+	fmt.Println("Tags:         ", strings.Join(proj.Tags, ", "))
+	fmt.Println("Notes:        ", strings.Join(proj.Notes, ", "))
+	fmt.Printf("Date Created:  %v\n", proj.DateCreated)
+	fmt.Printf("Date Modified: %v\n", proj.DateModified)
+	if proj.GitURL != "" {
+		fmt.Println("Git URL:      ", proj.GitURL)
+	}
+	fmt.Println("====================================")
+}
+
+// The rest of your functions remain unchanged...
 func implementTodo(service *todo.FileTodoService, coderPath string, reader *bufio.Reader) {
 	executeTodoCommand(service, coderPath, reader, "ongoing", "implement", "create")
 }
@@ -127,7 +151,7 @@ func printProjectHelp() {
   launch    - Launch the project
   implement - Implement a todo
   finish    - Mark a todo as complete
-  edit      - Edit project tags
+  edit      - Edit project info (tags, notes, name, alias, project type)
   exit      - Exit the Project REPL`)
 }
 
