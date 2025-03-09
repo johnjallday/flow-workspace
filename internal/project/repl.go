@@ -15,23 +15,22 @@ import (
 
 // StartProjectREPL starts an interactive REPL for a single project directory.
 func StartProjectREPL(dbPath string, projectDir string) {
-	clearScreen()
-
-	todoFile := filepath.Join(projectDir, "todo.md")
-	service := todo.NewFileTodoService(todoFile)
-	todos, err := service.ListTodos()
-	if err != nil {
-		fmt.Printf("Error loading todos: %v\n", err)
-	} else {
-		todo.PrintTodos(todos)
-	}
-
 	coderPath := "/Users/jj/Workspace/johnj-programming/gorani-coder/main"
 	reader := bufio.NewReader(os.Stdin)
 
 	for {
-		fmt.Printf("\n[project:%s] >> ", filepath.Base(projectDir))
-		todo.PrintTodos(todos)
+		clearScreen()
+
+		todoFile := filepath.Join(projectDir, "todo.md")
+
+		service := todo.NewFileTodoService(todoFile)
+		todos, err := service.ListTodos()
+		if err != nil {
+			fmt.Printf("Error loading todos: %v\n", err)
+		} else {
+			todo.PrintTodos(todos)
+		}
+
 		printProjectHelp()
 		fmt.Println("Enter a command:")
 
