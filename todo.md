@@ -1,3 +1,4 @@
+- [x] finish todo select only ongoing #created:2025-03-09 #project:flow-workspace #workspace:johnj-programming #completed:2025-03-09
 - [x] project repl print project info #created:2025-03-09 #project:flow-workspace #workspace:johnj-programming #completed:2025-03-09
 - [x] editTag #created:2025-03-08 #project:flow-workspace #workspace:johnj-programming #completed:2025-03-09
 - [x] coder agent integration #created:2025-03-08 #project:flow-workspace #workspace:johnj-programming #completed:2025-03-08

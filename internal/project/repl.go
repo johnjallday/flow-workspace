@@ -117,7 +117,6 @@ func printProjectInfo(proj *Project) {
 func printProjectHelp() {
 	fmt.Println(`Available commands (Project REPL):
   todo      - Open the TODO REPL for this project (exits Project REPL)
-  launch    - Launch the project
   implement - Implement a todo
   finish    - Mark a todo as complete
   edit      - Edit project info (tags, notes, name, alias, project type)
@@ -143,26 +142,44 @@ func executeTodoCommand(service *todo.FileTodoService, coderPath string, reader 
 		return
 	}
 
-	fmt.Print("Enter the number of the todo: ")
-	input, err := reader.ReadString('\n')
-	if err != nil {
-		fmt.Printf("Error reading input: %v\n", err)
-		return
-	}
-	input = strings.TrimSpace(input)
-	index, err := strconv.Atoi(input)
-	if err != nil || index < 1 || index > len(todos) {
-		fmt.Println("Invalid todo number.")
-		return
+	// If the action is to finish a task, we want to work with tasks that are ongoing.
+	selectedIndex := -1
+	ongoingCount := 0
+	for i, t := range todos {
+		if t.Ongoing {
+			ongoingCount++
+			selectedIndex = i
+		}
 	}
 
-	if err := service.EditTodo(index-1, "", "", status); err != nil {
+	if ongoingCount == 1 {
+		fmt.Printf("Automatically selecting the only ongoing task: %d\n", selectedIndex+1)
+	} else {
+		// Otherwise, prompt the user for a todo number.
+		fmt.Print("Enter the number of the todo: ")
+		input, err := reader.ReadString('\n')
+		if err != nil {
+			fmt.Printf("Error reading input: %v\n", err)
+			return
+		}
+		input = strings.TrimSpace(input)
+		index, err := strconv.Atoi(input)
+		if err != nil || index < 1 || index > len(todos) {
+			fmt.Println("Invalid todo number.")
+			return
+		}
+		selectedIndex = index - 1
+	}
+
+	// Update the selected todo with the new status.
+	// (Assuming service.EditTodo will update the Ongoing field accordingly: e.g., false for "complete")
+	if err := service.EditTodo(selectedIndex, "", "", status); err != nil {
 		fmt.Printf("Error updating todo: %v\n", err)
 		return
 	}
 
 	fmt.Printf("Todo updated successfully to %s!\n", status)
-	description := todos[index-1].Description
+	description := todos[selectedIndex].Description
 	formattedDescription := strings.ReplaceAll(description, " ", "-")
 
 	cmd := exec.Command(coderPath, command, action, formattedDescription)
@@ -172,6 +189,23 @@ func executeTodoCommand(service *todo.FileTodoService, coderPath string, reader 
 		fmt.Printf("Error executing command: %v\n", err)
 	} else {
 		fmt.Printf("Command '%s %s' executed successfully!\n", command, action)
+	}
+
+	// When finishing a task, ask if the user is done with the ongoing task.
+	if status == "complete" {
+		fmt.Print("Are you done with the ongoing task? (y/n): ")
+		answer, _ := reader.ReadString('\n')
+		answer = strings.TrimSpace(strings.ToLower(answer))
+		if answer != "y" && answer != "yes" {
+			// Revert the task status back to ongoing if the user isn't done.
+			if err := service.EditTodo(selectedIndex, "", "", "ongoing"); err != nil {
+				fmt.Printf("Error reverting task status: %v\n", err)
+			} else {
+				fmt.Println("Task remains ongoing.")
+			}
+		} else {
+			fmt.Println("Task marked as complete.")
+		}
 	}
 }
 
