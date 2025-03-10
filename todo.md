@@ -1,7 +1,7 @@
 - [x] delete todo menu in project repl #created:2025-03-10 #project:flow-workspace #workspace:johnj-programming #completed:2025-03-10
 - [x] weekly to project repl #created:2025-03-10 #project:flow-workspace #workspace:johnj-programming #completed:2025-03-10
 - [x] edit todo in project repl #created:2025-03-10 #project:flow-workspace #workspace:johnj-programming #completed:2025-03-10
-- [ ] project repl update date modified #created:2025-03-09 #project:flow-workspace #workspace:johnj-programming
+- [x] project repl update date modified #created:2025-03-09 #project:flow-workspace #workspace:johnj-programming #completed:2025-03-10
 - [x] when ongoing show on-going todo #created:2025-03-09 #project:flow-workspace #workspace:johnj-programming #completed:2025-03-10
 - [x] add todo to project REPL #created:2025-03-09 #project:flow-workspace #workspace:johnj-programming #completed:2025-03-10
 - [ ] startup loads device info #created:2025-03-09 #project:flow-workspace #workspace:johnj-programming
@@ -21,4 +21,3 @@
 - [ ] command interface #created:2025-02-22 #project:flow-workspace #workspace:johnj-programming
 - [x] weekly review #created:2025-02-20 #project:flow-workspace #workspace:johnj-programming #completed:2025-03-07
 - [ ] projects and workspace table sqlite #created:2025-02-20 #project:flow-workspace #workspace:johnj-programming
-- [ ] initial config management for installation #created:2025-02-20 #project:flow-workspace #workspace:johnj-programming
