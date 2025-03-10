@@ -76,7 +76,6 @@ func StartProjectREPL(dbPath string, projectDir string) {
 		case "finish":
 			finishTodo(service, coderPath, reader)
 		case "edit":
-			// Use the project metadata file.
 			if err := editProjectInfo(metaFile); err != nil {
 				fmt.Printf("Error editing project info: %v\n", err)
 			}
@@ -85,6 +84,25 @@ func StartProjectREPL(dbPath string, projectDir string) {
 		case "todo":
 			todo.StartTodoREPL(dbPath, todoFile)
 			return
+		case "add-todo":
+			fmt.Print("Enter todo description: ")
+			description, _ := reader.ReadString('\n')
+			description = strings.TrimSpace(description)
+
+			fmt.Print("Enter due date (YYYY-MM-DD) or leave blank: ")
+			dueDate, _ := reader.ReadString('\n')
+			dueDate = strings.TrimSpace(dueDate)
+
+			// Reuse the same business logic
+			err := AddTodoToProject(projectDir, description, dueDate)
+			if err != nil {
+				fmt.Printf("Error adding todo: %v\n", err)
+			} else {
+				fmt.Println("Todo added successfully!")
+			}
+
+			fmt.Println("Press Enter to continue...")
+			reader.ReadString('\n')
 		case "exit":
 			fmt.Println("Exiting Project REPL. Goodbye!")
 			return
@@ -113,10 +131,10 @@ func printProjectInfo(proj *Project) {
 	fmt.Println("====================================")
 }
 
-// Updated help menu.
 func printProjectHelp() {
 	fmt.Println(`Available commands (Project REPL):
   todo      - Open the TODO REPL for this project (exits Project REPL)
+  add-todo  - Add a new TODO to this project
   implement - Implement a todo
   finish    - Mark a todo as complete
   edit      - Edit project info (tags, notes, name, alias, project type)
@@ -142,7 +160,7 @@ func executeTodoCommand(service *todo.FileTodoService, coderPath string, reader 
 		return
 	}
 
-	// If the action is to finish a task, we want to work with tasks that are ongoing.
+	// Attempt to automatically select the todo if exactly one is ongoing.
 	selectedIndex := -1
 	ongoingCount := 0
 	for i, t := range todos {
@@ -152,10 +170,29 @@ func executeTodoCommand(service *todo.FileTodoService, coderPath string, reader 
 		}
 	}
 
+	// If exactly one ongoing task exists, prompt user whether to proceed.
 	if ongoingCount == 1 {
-		fmt.Printf("Automatically selecting the only ongoing task: %d\n", selectedIndex+1)
+		fmt.Printf("Automatically selecting the only ongoing task: %d. Proceed? (y/n): ", selectedIndex+1)
+		answer, _ := reader.ReadString('\n')
+		answer = strings.TrimSpace(strings.ToLower(answer))
+		if answer != "y" && answer != "yes" {
+			// User did not want to use the automatic selection; prompt for manual input.
+			fmt.Print("Enter the number of the todo: ")
+			input, err := reader.ReadString('\n')
+			if err != nil {
+				fmt.Printf("Error reading input: %v\n", err)
+				return
+			}
+			input = strings.TrimSpace(input)
+			index, err := strconv.Atoi(input)
+			if err != nil || index < 1 || index > len(todos) {
+				fmt.Println("Invalid todo number.")
+				return
+			}
+			selectedIndex = index - 1
+		}
 	} else {
-		// Otherwise, prompt the user for a todo number.
+		// If there isn't exactly one ongoing task, prompt the user.
 		fmt.Print("Enter the number of the todo: ")
 		input, err := reader.ReadString('\n')
 		if err != nil {
@@ -172,7 +209,6 @@ func executeTodoCommand(service *todo.FileTodoService, coderPath string, reader 
 	}
 
 	// Update the selected todo with the new status.
-	// (Assuming service.EditTodo will update the Ongoing field accordingly: e.g., false for "complete")
 	if err := service.EditTodo(selectedIndex, "", "", status); err != nil {
 		fmt.Printf("Error updating todo: %v\n", err)
 		return

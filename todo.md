@@ -1,3 +1,9 @@
+- [ ] edit todo in project repl #created:2025-03-10 #project:flow-workspace #workspace:johnj-programming
+- [ ] project repl update date modified #created:2025-03-09 #project:flow-workspace #workspace:johnj-programming
+- [ ] when ongoing show on-going todo #created:2025-03-09 #project:flow-workspace #workspace:johnj-programming
+- [x] add todo to project REPL #created:2025-03-09 #project:flow-workspace #workspace:johnj-programming #completed:2025-03-10
+- [ ] device handler #created:2025-03-09 #project:flow-workspace #workspace:johnj-programming
+- [ ] prompt handler #created:2025-03-09 #project:flow-workspace #workspace:johnj-programming
 - [x] finish todo select only ongoing #created:2025-03-09 #project:flow-workspace #workspace:johnj-programming #completed:2025-03-09
 - [x] project repl print project info #created:2025-03-09 #project:flow-workspace #workspace:johnj-programming #completed:2025-03-09
 - [x] editTag #created:2025-03-08 #project:flow-workspace #workspace:johnj-programming #completed:2025-03-09
