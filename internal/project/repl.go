@@ -170,6 +170,52 @@ func StartProjectREPL(dbPath string, projectDir string) {
 
 			fmt.Println("Press Enter to continue...")
 			reader.ReadString('\n')
+
+		case "delete-todo":
+			todos, err := service.ListTodos()
+			if err != nil {
+				fmt.Printf("Error loading todos: %v\n", err)
+				break
+			}
+
+			if len(todos) == 0 {
+				fmt.Println("No tasks available to delete.")
+				break
+			}
+
+			todo.PrintTodos(todos)
+
+			fmt.Print("Enter the number of the todo to delete: ")
+			input, err := reader.ReadString('\n')
+			if err != nil {
+				fmt.Println("Error reading input:", err)
+				break
+			}
+			input = strings.TrimSpace(input)
+			index, err := strconv.Atoi(input)
+			if err != nil || index < 1 || index > len(todos) {
+				fmt.Println("Invalid task number.")
+				break
+			}
+			selectedIndex := index - 1
+
+			// Confirm deletion
+			fmt.Printf("Are you sure you want to delete task #%d: \"%s\"? (y/n): ", index, todos[selectedIndex].Description)
+			confirm, _ := reader.ReadString('\n')
+			confirm = strings.TrimSpace(strings.ToLower(confirm))
+			if confirm != "y" && confirm != "yes" {
+				fmt.Println("Delete canceled.")
+				break
+			}
+
+			if err := service.DeleteTodo(selectedIndex); err != nil {
+				fmt.Printf("Error deleting task: %v\n", err)
+			} else {
+				fmt.Println("Task deleted successfully.")
+			}
+
+			fmt.Println("Press Enter to continue...")
+			reader.ReadString('\n')
 		case "weekly":
 			fmt.Println("Running weekly review...")
 			todo.ReviewWeekly(todos)
@@ -209,6 +255,7 @@ func printProjectHelp() {
   todo       - Open the TODO REPL for this project (exits Project REPL)
   add-todo   - Add a new TODO to this project
   edit-todo  - Edit a TODO item in this project
+  delete-todo- Delete a TODO item in this project
   weekly     - Run a weekly review of project tasks
   implement  - Implement a todo
   finish     - Mark a todo as complete
