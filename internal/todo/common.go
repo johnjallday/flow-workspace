@@ -226,3 +226,14 @@ func formatTodo(t Todo) string {
 	}
 	return lineBuilder.String()
 }
+
+// FilterTodosByOngoing returns a list of todos that are marked as ongoing.
+func FilterTodosByOngoing(todos []Todo) []Todo {
+	var ongoingTodos []Todo
+	for _, t := range todos {
+		if t.Ongoing {
+			ongoingTodos = append(ongoingTodos, t)
+		}
+	}
+	return ongoingTodos
+}

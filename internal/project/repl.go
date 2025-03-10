@@ -66,7 +66,13 @@ func StartProjectREPL(dbPath string, projectDir string) {
 		if err != nil {
 			fmt.Printf("Error loading todos: %v\n", err)
 		} else {
-			todo.PrintTodos(todos)
+			ongoingTodos := todo.FilterTodosByOngoing(todos)
+			if len(ongoingTodos) == 0 {
+				fmt.Println("No ongoing tasks found.")
+				todo.PrintTodos(todos)
+			} else {
+				todo.PrintTodos(ongoingTodos)
+			}
 		}
 
 		printProjectHelp()
@@ -169,6 +175,7 @@ func StartProjectREPL(dbPath string, projectDir string) {
 			todo.ReviewWeekly(todos)
 			fmt.Print("Press Enter to continue...")
 			_, _ = reader.ReadString('\n')
+
 		case "exit":
 			fmt.Println("Exiting Project REPL. Goodbye!")
 			return
