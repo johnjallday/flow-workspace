@@ -10,6 +10,7 @@ import (
 	"strconv"
 	"strings"
 
+	db "github.com/johnjallday/flow-workspace/internal/db/todo"
 	"github.com/johnjallday/flow-workspace/internal/todo"
 )
 
@@ -17,6 +18,15 @@ import (
 func StartProjectREPL(dbPath string, projectDir string) {
 	coderPath := "/Users/jj/Workspace/johnj-programming/gorani-coder/main"
 	reader := bufio.NewReader(os.Stdin)
+
+	mydb, err := db.InitDB(dbPath)
+	if err != nil {
+		fmt.Println("Error connecting to db:", err)
+		return
+	}
+
+	todoFile := filepath.Join(projectDir, "todo.md")
+	todo.MigrateFinishedTodos(todoFile, mydb)
 
 	for {
 		clearScreen()
@@ -51,7 +61,6 @@ func StartProjectREPL(dbPath string, projectDir string) {
 		}
 
 		// Load and print todos.
-		todoFile := filepath.Join(projectDir, "todo.md")
 		service := todo.NewFileTodoService(todoFile)
 		todos, err := service.ListTodos()
 		if err != nil {
@@ -155,6 +164,11 @@ func StartProjectREPL(dbPath string, projectDir string) {
 
 			fmt.Println("Press Enter to continue...")
 			reader.ReadString('\n')
+		case "weekly":
+			fmt.Println("Running weekly review...")
+			todo.ReviewWeekly(todos)
+			fmt.Print("Press Enter to continue...")
+			_, _ = reader.ReadString('\n')
 		case "exit":
 			fmt.Println("Exiting Project REPL. Goodbye!")
 			return
@@ -188,6 +202,7 @@ func printProjectHelp() {
   todo       - Open the TODO REPL for this project (exits Project REPL)
   add-todo   - Add a new TODO to this project
   edit-todo  - Edit a TODO item in this project
+  weekly     - Run a weekly review of project tasks
   implement  - Implement a todo
   finish     - Mark a todo as complete
   edit       - Edit project info (tags, notes, name, alias, project type)

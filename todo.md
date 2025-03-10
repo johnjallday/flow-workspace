@@ -1,3 +1,4 @@
+- [x] weekly to project repl #created:2025-03-10 #project:flow-workspace #workspace:johnj-programming #completed:2025-03-10
 - [x] edit todo in project repl #created:2025-03-10 #project:flow-workspace #workspace:johnj-programming #completed:2025-03-10
 - [ ] project repl update date modified #created:2025-03-09 #project:flow-workspace #workspace:johnj-programming
 - [ ] when ongoing show on-going todo #created:2025-03-09 #project:flow-workspace #workspace:johnj-programming
