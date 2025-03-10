@@ -103,6 +103,58 @@ func StartProjectREPL(dbPath string, projectDir string) {
 
 			fmt.Println("Press Enter to continue...")
 			reader.ReadString('\n')
+		case "edit-todo":
+			todos, err := service.ListTodos()
+			if err != nil {
+				fmt.Printf("Error loading todos: %v\n", err)
+				break
+			}
+
+			if len(todos) == 0 {
+				fmt.Println("No tasks available to edit.")
+				break
+			}
+
+			// Prompt user to pick a todo by number
+			fmt.Print("Enter the number of the todo to edit: ")
+			input, err := reader.ReadString('\n')
+			if err != nil {
+				fmt.Printf("Error reading input: %v\n", err)
+				break
+			}
+			input = strings.TrimSpace(input)
+			index, err := strconv.Atoi(input)
+			if err != nil || index < 1 || index > len(todos) {
+				fmt.Println("Invalid todo number.")
+				break
+			}
+			selectedIndex := index - 1
+
+			// Prompt for new values (leave blank to keep current)
+			fmt.Printf("Current description: %s\n", todos[selectedIndex].Description)
+			fmt.Print("Enter new description (leave blank to keep current): ")
+			newDescription, _ := reader.ReadString('\n')
+			newDescription = strings.TrimSpace(newDescription)
+
+			fmt.Printf("Current due date: %s\n", todos[selectedIndex].DueDate.Format("2006-01-02"))
+			fmt.Print("Enter new due date (YYYY-MM-DD, leave blank to keep current): ")
+			newDueDate, _ := reader.ReadString('\n')
+			newDueDate = strings.TrimSpace(newDueDate)
+
+			fmt.Print("Enter new status (ongoing/complete, leave blank to keep current): ")
+			newStatus, _ := reader.ReadString('\n')
+			newStatus = strings.TrimSpace(newStatus)
+
+			// Call the service to edit the todo
+			err = service.EditTodo(selectedIndex, newDescription, newDueDate, newStatus)
+			if err != nil {
+				fmt.Printf("Error editing todo: %v\n", err)
+			} else {
+				fmt.Println("Todo edited successfully.")
+			}
+
+			fmt.Println("Press Enter to continue...")
+			reader.ReadString('\n')
 		case "exit":
 			fmt.Println("Exiting Project REPL. Goodbye!")
 			return
@@ -133,12 +185,13 @@ func printProjectInfo(proj *Project) {
 
 func printProjectHelp() {
 	fmt.Println(`Available commands (Project REPL):
-  todo      - Open the TODO REPL for this project (exits Project REPL)
-  add-todo  - Add a new TODO to this project
-  implement - Implement a todo
-  finish    - Mark a todo as complete
-  edit      - Edit project info (tags, notes, name, alias, project type)
-  exit      - Exit the Project REPL`)
+  todo       - Open the TODO REPL for this project (exits Project REPL)
+  add-todo   - Add a new TODO to this project
+  edit-todo  - Edit a TODO item in this project
+  implement  - Implement a todo
+  finish     - Mark a todo as complete
+  edit       - Edit project info (tags, notes, name, alias, project type)
+  exit       - Exit the Project REPL`)
 }
 
 func implementTodo(service *todo.FileTodoService, coderPath string, reader *bufio.Reader) {
