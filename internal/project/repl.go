@@ -348,23 +348,6 @@ func executeTodoCommand(service *todo.FileTodoService, coderPath string, reader 
 	} else {
 		fmt.Printf("Command '%s %s' executed successfully!\n", command, action)
 	}
-
-	// When finishing a task, ask if the user is done with the ongoing task.
-	if status == "complete" {
-		fmt.Print("Are you done with the ongoing task? (y/n): ")
-		answer, _ := reader.ReadString('\n')
-		answer = strings.TrimSpace(strings.ToLower(answer))
-		if answer != "y" && answer != "yes" {
-			// Revert the task status back to ongoing if the user isn't done.
-			if err := service.EditTodo(selectedIndex, "", "", "ongoing"); err != nil {
-				fmt.Printf("Error reverting task status: %v\n", err)
-			} else {
-				fmt.Println("Task remains ongoing.")
-			}
-		} else {
-			fmt.Println("Task marked as complete.")
-		}
-	}
 }
 
 func clearScreen() {

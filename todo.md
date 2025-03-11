@@ -1,3 +1,4 @@
+- [x] fix finish prompting twice to complete #created:2025-03-10 #project:flow-workspace #workspace:johnj-programming #completed:2025-03-10
 - [x] delete todo menu in project repl #created:2025-03-10 #project:flow-workspace #workspace:johnj-programming #completed:2025-03-10
 - [x] weekly to project repl #created:2025-03-10 #project:flow-workspace #workspace:johnj-programming #completed:2025-03-10
 - [x] edit todo in project repl #created:2025-03-10 #project:flow-workspace #workspace:johnj-programming #completed:2025-03-10
